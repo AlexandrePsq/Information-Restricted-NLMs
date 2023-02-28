@@ -1,0 +1,15 @@
+gutenberg_cleaner
+spacy
+pandas 
+numpy
+benepar
+tqdm
+joblib
+regex
+nltk
+inflect
+gdown
+transformers
+tokenizers
+torch
+seaborn
