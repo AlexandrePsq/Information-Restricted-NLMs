@@ -1,10 +1,21 @@
 import os
 import yaml
 import pickle
+import inspect
 import datetime
 
 
-
+def filter_args(func, d):
+    """ Filter dictionary keys to match the function arguments.
+    Arguments:
+        - func: function
+        - d: dict
+    Returns:
+        - args: dict
+    """
+    keys = inspect.getfullargspec(func).args
+    args = {key: d[key] for key in keys if key!='self'}
+    return args
 
 def load_pickle(filename):
     """Load pickle file with PROTOCOL 5.
@@ -53,7 +64,7 @@ def save_yaml(data, yaml_path):
     with open(yaml_path, 'w') as outfile:
         yaml.dump(data, outfile, default_flow_style=False)
     
-def write(path, text, end='\n'):
+def write(path, text, end=''): #end='\n'
     """Write in the specified text file."""
     with open(path, 'a+') as f:
         f.write(text)

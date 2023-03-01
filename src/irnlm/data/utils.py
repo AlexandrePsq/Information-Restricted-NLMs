@@ -30,21 +30,33 @@ def get_gutenberg_book_ids():
     """Return the list of Gutenberg bookds that
     were downloaded before behing filtered and cleaned.
     """
-    result = open('../../data/gutenberg_books_list.txt', 'r').read().split('')
+    result = open('data/gutenberg_books_list.txt', 'r').read().split(' ')
     return result
+
+def load_path_from_ids(id_):
+    """Load the path to the book associated with the id.
+    Args:
+        - id_: int
+    Returns:
+        - text: str
+    """
+    path = f'...{id_}'
+    #text = open(path, 'r').read()
+    #return text
+    raise NotImplementedError('You need to create your own fetcher!')
 
 def get_function_words():
     """Return the list of Gutenberg bookds that
     were downloaded before behing filtered and cleaned.
     """
-    result = open('../../data/english_function_words.txt', 'r').read().split('\n')
+    result = open('data/english_function_words.txt', 'r').read().split('\n')
     return result
 
 def get_ids_syntax():
     """The syntax ids that are directly computed need to start from 0.
     This is what we correct here with the mapping that is being loaded.
     """
-    result = read_yaml('../../data/syntax-id_to_train-id.yml')
+    result = read_yaml('data/syntax-id_to_train-id.yml')
     return result
 
 def get_possible_morphs():
@@ -57,11 +69,11 @@ def get_possible_morphs():
               'Case=Acc|Number=Plur|Person=1|PronType=Prs|Reflex=Yes', 'Case=Acc|Number=Plur|Person=3|PronType=Prs', 
               'Case=Acc|Number=Plur|Person=3|PronType=Prs|Reflex=Yes', 'Case=Acc|Number=Sing|Person=1|PronType=Prs', 
               'Case=Acc|Number=Sing|Person=1|PronType=Prs|Reflex=Yes', 'Case=Acc|Person=2|PronType=Prs|Reflex=Yes', 
-              'Case=Nom|Gender=Fem|Number=Sing|Person=3|PronType=Prs', 'Case=Nom|Gender=Masc|Number=Sing|Person=3|PronType=Prs',
+              'Case=Nom|Gender=Fem|Number=Sing|Person=3|PronType=Prs', 'Case=Nom|Gender=Masc|Number=Sing|Person=3|PronType=Prs', 
               'Case=Nom|Number=Plur|Person=1|PronType=Prs', 'Case=Nom|Number=Plur|Person=3|PronType=Prs', 
-              'Case=Nom|Number=Sing|Person=1|PronType=Prs', 'ConjType=Cmp', 'Definite=Def|PronType=Art', 'Definite=Ind|PronType=Art', 
-              'Degree=Cmp', 'Degree=Pos', 'Degree=Sup', 'Foreign=Yes', 'Gender=Fem|Number=Sing|Person=3|Poss=Yes|PronType=Prs', 
-              'Gender=Fem|Number=Sing|Person=3|Poss=Yes|PronType=Prs|Reflex=Yes', 
+              'Case=Nom|Number=Sing|Person=1|PronType=Prs', 'ConjType=Cmp', 'Definite=Def|PronType=Art', 
+              'Definite=Ind|PronType=Art', 'Degree=Cmp', 'Degree=Pos', 'Degree=Sup', 'Foreign=Yes', 
+              'Gender=Fem|Number=Sing|Person=3|Poss=Yes|PronType=Prs', 'Gender=Fem|Number=Sing|Person=3|Poss=Yes|PronType=Prs|Reflex=Yes', 
               'Gender=Masc|Number=Sing|Person=3|Poss=Yes|PronType=Prs', 'Gender=Masc|Number=Sing|Person=3|Poss=Yes|PronType=Prs|Reflex=Yes', 
               'Gender=Neut|Number=Sing|Person=3|Poss=Yes|PronType=Prs', 'Gender=Neut|Number=Sing|Person=3|PronType=Prs', 'Hyph=Yes', 
               'Mood=Ind|Number=Sing|Person=3|Tense=Past|VerbForm=Fin', 'Mood=Ind|Number=Sing|Person=3|Tense=Pres|VerbForm=Fin', 
@@ -77,8 +89,7 @@ def get_possible_morphs():
               'Tense=Past|VerbForm=Fin', 'Tense=Past|VerbForm=Part', 'Tense=Pres|VerbForm=Fin', 'VerbForm=Fin', 'VerbForm=Inf', 
               'VerbType=Mod', 'Gender=Neut|Number=Sing|Person=3|Poss=Yes|PronType=Prs|Reflex=Yes', 
               'Case=Nom|Gender=Neut|Number=Sing|Person=3|PronType=Prs', 'Case=Acc|Person=2|PronType=Prs', 'Case=Nom|Person=2|PronType=Prs', 
-              'Case=Acc|Gender=Neut|Number=Sing|Person=3|PronType=Prs'
-              ]
+              'Case=Acc|Gender=Neut|Number=Sing|Person=3|PronType=Prs']
     return result
 
 def get_possible_tag():
@@ -99,12 +110,10 @@ def get_possible_tag():
 def get_possible_pos():
     """Retrieve list of possible POS.
     """
-    result = [
-        'ADJ', 'ADP', 'ADV', 'AUX', 'CCONJ', 'DET', 
-        'INTJ', 'NOUN', 'NUM', 'PART', 'PRON', 
-        'PROPN', 'PUNCT', 'SCONJ', 'SYM', 'VERB', 
-        'X'#, 'SPACE'
-        ]
+    result = ['PUNCT', 'ADV', 'AUX', 'SYM', 'ADP', 
+              'SCONJ', 'VERB', 'X', 'PART', 'DET', 
+              'NUM', 'NOUN', 'PRON', 'ADJ', 'CCONJ', 
+              'PROPN', 'INTJ', 'SPACE']
     return result
 
 def get_possible_dep():
@@ -134,7 +143,7 @@ def get_punctuation():
         ]
     return result
 
-def get_word_list_and_freq(path='../../lexique_database.tsv'):
+def get_word_list_and_freq(path='data/lexique_database.tsv'):
     """Retrieve list of english words and their frequenc in
     a given database.
     """
@@ -338,7 +347,7 @@ def fetch_model_maps(
         model_names, 
         language='english',
         verbose=1,
-        FMRIDATA_PATH="/neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/derivatives/fMRI/maps/english"
+        FMRIDATA_PATH="derivatives/fMRI/maps/english"
     ):
     """Retrieve the maps computed for each subject of The Little Prince.
     Arguments:

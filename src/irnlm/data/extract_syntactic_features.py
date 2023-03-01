@@ -9,8 +9,7 @@ pos = get_possible_pos()
 
 
 def extract_syntax(doc): 
-    """Extract POS, Morph and NCN (=number of closing nodes) 
-    for each words of an input sequence. 
+    """Extract number of closing nodes for each words of an input sequence. 
     """ 
     ncn = [] 
     morph = []
@@ -36,7 +35,8 @@ def extract_syntax(doc):
                 count+=1
                 i+=1
             ncn.append(str(min(count, 9))) # we take into account a maximum of 9 closing parenthesis
-            parsed_string = parsed_string[i:] 
+            parsed_string = parsed_string[i:]
+    #print(morphs, ncn)
     return [int(''.join(items)) for items in list(zip(ncn, morph, pos_))]
 
 def integral2syntactic(path, nlp, transform_ids, language='english'):
@@ -51,7 +51,7 @@ def integral2syntactic(path, nlp, transform_ids, language='english'):
     """
     iterator = tokenize(path, language=language, with_punctuation=True, convert_numbers=True)
     iterator = [item.strip() for item in iterator]
-    iterator = [' '.join([word.lower() for word in sent.split(' ')]) for sent in iterator]
+    #iterator = [' '.join([word.lower() for word in sent.split(' ')]) for sent in iterator]
     docs = [nlp(sent) for sent in iterator if sent !='']
 
     sentences = [doc.text.split(' ') for doc in docs]

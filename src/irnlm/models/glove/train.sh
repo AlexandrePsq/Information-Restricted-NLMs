@@ -15,16 +15,16 @@ make
 #  rm text8.zip
 #fi
 
-CORPUS=... # path to training data
-VOCAB_FILE=vocab.txt # path to vocabulary (it can be an empty path if you want to compute the vocabulary on the training data)
+CORPUS=../../../../data/train.txt # path to training data
+VOCAB_FILE=vocab_Integral.txt # path to vocabulary (it can be an empty path if you want to compute the vocabulary on the training data)
 # You can set vocabulary size (default=50001) in src/vocab_count.c
 COOCCURRENCE_FILE=cooccurrence.bin
 COOCCURRENCE_SHUF_FILE=cooccurrence.shuf.bin
 BUILDDIR=build
-SAVE_FILE=vectors
+SAVE_FILE=GloVe_Integral # name of the output file containing the vectors
 VERBOSE=2
 MEMORY=4.0
-VOCAB_MIN_COUNT=5
+VOCAB_MIN_COUNT=3
 VECTOR_SIZE=768 # embedding vector size
 MAX_ITER=20
 WINDOW_SIZE=15 # context window size

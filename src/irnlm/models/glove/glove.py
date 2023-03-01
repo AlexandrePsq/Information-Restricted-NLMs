@@ -4,10 +4,10 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
+from irnlm.data.text_tokenizer import tokenize
 
 
-
-def load_model_and_tokenizer(trained_model='../data/glove.6B.300d.txt'):
+def load_model_and_tokenizer(trained_model='data/glove.6B.300d.txt'):
     """Load a GloVe model given its name.
     Download Glove weights from URL if not already done.
     Args:
@@ -16,7 +16,7 @@ def load_model_and_tokenizer(trained_model='../data/glove.6B.300d.txt'):
         - model: dict
         - tokenizer: None
     """
-    if ~os.path.exists(trained_model):
+    if not os.path.exists(trained_model):
         url = "https://nlp.stanford.edu/data/glove.6B.zip"
         output = './data/glove.zip'
         gdown.download(url, output, quiet=False)
@@ -25,7 +25,7 @@ def load_model_and_tokenizer(trained_model='../data/glove.6B.300d.txt'):
     return model, None
 
 
-def init_embeddings(trained_model='../data/glove.6B.300d.txt'):
+def init_embeddings(trained_model='data/glove.6B.300d.txt'):
     """ Initialize an instance of GloVe Dictionary.
     Args:
         - trained_model: str
@@ -138,15 +138,20 @@ def update_model(glove_model, embedding_size=300):
     return glove_model
 
 def extract_features(
-    words, 
+    path, 
     model, 
+    language='english',
     FEATURE_COUNT=300,
     ):
     """Extract the features from GloVe.
     Args:
-        - words: list of str
+        - path: str
         - model: GloVe model
+    Returns:
+        - features: csv
     """
+    sentences = tokenize(path, language=language, with_punctuation=True, convert_numbers=True)
+    words = [w for sent in sentences for w in sent.split(' ')]
     features = []
     columns = ['embedding-{}'.format(i) for i in range(1, 1 + FEATURE_COUNT)]
     features = []
@@ -154,6 +159,6 @@ def extract_features(
         if item not in model.keys():
             item = '<unk>'
         features.append(model[item])
-
+        
     features = pd.DataFrame(np.vstack(features), columns=columns)
     return features

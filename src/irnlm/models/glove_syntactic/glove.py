@@ -4,6 +4,11 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
+import benepar
+from spacy.symbols import ORTH
+
+from irnlm.data.utils import set_nlp_pipeline, get_ids_syntax
+from irnlm.data.extract_syntactic_features import integral2syntactic
 
 
 
@@ -16,7 +21,7 @@ def load_model_and_tokenizer(trained_model='../data/glove.6B.300d.txt'):
         - model: dict
         - tokenizer: None
     """
-    if ~os.path.exists(trained_model):
+    if not os.path.exists(trained_model):
         url = "https://nlp.stanford.edu/data/glove.6B.zip"
         output = './data/glove.zip'
         gdown.download(url, output, quiet=False)
@@ -48,84 +53,7 @@ def update_model(glove_model, embedding_size=300):
     Returns:
         - glove_model: dict
     """
-    words2add = {"that's":(['that', "is"], 1),
-                        "it's":(['it', "is"], 1),
-                        "what's":(['what', "is"], 1),
-                        "i'm":(['i', "am"], 1),
-                        "can't":(['can', "not"], 1),
-                        "you're":(['you', "are"], 1),
-                        "we're":(['we', "are"], 1),
-                        "don't":(['do', "not"], 1),
-                        "buffay":(['she'], 1),
-                        "she's":(['she', "has"], 1),
-                        "victoria's":(['victoria', "has"], 1),
-                        "chandler's":(['chandler', "has"], 1),
-                        "dexter's":(['dexter', "has"], 1),
-                        "women's":(['women', "has"], 1),
-                        "i've":(['i', "have"], 1),
-                        "i'll":(['i', "will"], 1),
-                        "didn't":(['did', "not"], 1),
-                        "wasn't":(['was', "not"], 1),
-                        "we've":(['we', "have"], 1),
-                        "he's":(['he', "has"], 1),
-                        "you've":(['you', "have"], 1),
-                        "ben's":(['he', "has"], 1),
-                        "why'd":(['why', "did"], 1),
-                        "tonight's": (['tonight', "has"], 1),
-                        "blackout's": (['blackout', "has"], 1),
-                        "you'd": (['you', "would"], 1),
-                        "dad's": (['dad', "has"], 1),
-                        "oohhoo": (['oh'], 0),
-                        "pheebs": (['she'], 0),
-                        "let's": (['let', "us"], 1),
-                        "wouldn't": (['would', "not"], 1),
-                        "exwife": (['wife'], 0),
-                        "there's": (['there', "is"], 1),
-                        "mmhmm": (['oh'], 0),
-                        "it'snever": (['it', "has", "never"], 2),
-                        "you'll": (['you', "will"], 1),
-                        "shhshhshh": (['oh'], 0),
-                        "lalalalala": (['oh'], 0),
-                        "couldn't": (['could', 'not'], 1),
-                        "carol's":(['she', "has"], 1),
-                        "bloomingdale's":(['city', "has"], 1),
-                        "who's":(['who', "has"], 1),
-                        "isn't":(['is', "not"], 1),
-                        "doesn't":(['does', "not"], 1),
-                        "men's":(['men', "has"], 1),
-                        "uhhuh":(['oh'], 0),
-                        "won't":(['will', "not"], 1),
-                        "youwent":(['you', "went"], 1),
-                        "brother's":(['brother', "has"], 1),
-                        'hadn':(['had', 'n’t'], 1),
-                        'crossly':(['across'], 0), 
-                        'mustn':(['must', 'n’t'], 1),
-                        "i'd":(['i', 'would'], 1),
-                        "we'll":(['we', 'will'], 1),
-                        "she'll":(['she', 'will'], 1),
-                        "he'll":(['he', 'will'], 1),
-                        "liam's":(['liam', 'has'], 1),
-                        "they're":(['they', 'are'], 1),
-                        "guy's":(['guy', 'has'], 1),
-                        "somebody's":(['somebody', 'has'], 1),
-                        "julie's":(['she', 'has'], 1),
-                        "monica's":(['she', 'has'], 1),
-                        "dufus":(['he'], 0),
-                        "shouldn't":(['should', 'not'], 1),
-                        "dosomething":(['do', 'something'], 1),
-                        "mom's":(['mom', 'has'], 1),
-                        "they'd":(['they', 'would'], 1),
-                        "katrakas":(['thing'], 0),
-                        "that'll":(['that', 'will'], 1),
-                        "eye's":(['eye', 'has'], 1),
-                        "haven't":(['have', 'not'], 1),
-                        "hundered":(['thing'], 0),
-                        "hearthe":(['thing'], 0),
-                        "schmoon":(['thing'], 0),
-                        "scruddle":(['thing'], 0),
-                        "ojomo":(['thing'], 0),
-                        "happeed":(['thing'], 0),
-                        } # the second value in the tuple is the number of following words to skip in generate
+    words2add = {} # the second value in the tuple is the number of following words to skip in generate
     for key in words2add.keys():
         if key not in glove_model.keys():
             glove_model[key] = np.zeros((embedding_size,))
@@ -138,16 +66,31 @@ def update_model(glove_model, embedding_size=300):
     return glove_model
 
 def extract_features(
-    words, 
+    path, 
     model, 
     FEATURE_COUNT=300,
     ):
     """Extract the features from GloVe.
     Args:
-        - words: list of str
+        - path: list of str
         - model: GloVe model
+    Returns:
+        - features: csv
     """
     features = []
+    benepar.download('benepar_en3')
+
+    nlp = set_nlp_pipeline()
+    special_case = [{ORTH: "hasnt"}]
+    nlp.tokenizer.add_special_case("hasnt", special_case)
+    benepar.download('benepar_en3')
+    nlp.add_pipe('benepar', config={'model': 'benepar_en3'})
+    print(nlp.pipe_names)
+
+    transform_ids = get_ids_syntax()
+
+    words = integral2syntactic(path, nlp, transform_ids, language='english') # not words but ids
+
     columns = ['embedding-{}'.format(i) for i in range(1, 1 + FEATURE_COUNT)]
     features = []
     for item in tqdm(words):

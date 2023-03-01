@@ -33,7 +33,7 @@ def clean_text(path, filter_old_texts=True, save=True, vocab=None):
 
     # Filter old texts
     matches = re.findall('\\n\\n(?:19|20)\d{2}', text[:2000]) # check if there is publication date among 2000 first characters
-    if (len(matches) > 0) or not filter_old_texts:
+    if (len(matches) > 0) or filter_old_texts:
         # Replace numbers (optional) 
         #transf = inflect.engine()
         #numbers = re.findall('\d+', text)
@@ -53,15 +53,15 @@ def clean_text(path, filter_old_texts=True, save=True, vocab=None):
         text = [sent.lower() for sent in text]
         text = filter_with_vocab(text, vocab=vocab)  
 
-        directory = os.path.dirname(path)
-        name = os.path.basename(path)[:-4]
-        
-        if save:
-            with open(os.path.join(directory, name + '_cleaned.txt'), 'w') as f:
-                text = ' '.join(text)
-                f.write(text)
-        else:
-            return text
+    directory = os.path.dirname(path)
+    name = os.path.basename(path)[:-4]
+    
+    if save:
+        with open(os.path.join(directory, name + '_cleaned.txt'), 'w') as f:
+            text = ' '.join(text)
+            f.write(text)
+    else:
+        return text
 
 def filter_with_vocab(sentences: list, vocab: list) -> bool:
     """If one word of a sentence is not in vocabulary, it is removed.

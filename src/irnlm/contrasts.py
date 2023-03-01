@@ -137,7 +137,7 @@ def compute_group_level_maps(names, masker):
         vmax_list.append(np.max(effmaps_dict[key].get_fdata()))
     return zmaps_dict, effmaps_dict, masks_dict, vmax_list, fdr_th
 
-def compute_diff_group_level_maps(name1, name2, name3=None, masker=None, verbose=0):
+def compute_diff_group_level_maps(name1, name2, name3=None, masker=None, verbose=0, height_control='fdr', fdr=0.005):
     """
     """
     names = [name1, name2, name3] if name3 is not None else [name1, name2]
@@ -162,10 +162,10 @@ def compute_diff_group_level_maps(name1, name2, name3=None, masker=None, verbose
             vmax=None, 
             design_matrix=None, 
             p_val=None, 
-            fdr=0.005, 
+            fdr=fdr, 
             mask_img=masker.mask_img_, 
             cluster_threshold=30, 
-            height_control='fdr')
+            height_control=height_control)
         zmaps_dict[key] = zmap
         effmaps_dict[key] = effmap
         masks_dict[key] = mask

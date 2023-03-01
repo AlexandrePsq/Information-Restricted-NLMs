@@ -23,7 +23,10 @@ def load_model_and_tokenizer(trained_model='gpt2'):
         - model: HuggingFace model
         - tokenizer: HuggingFace tokenizer
     """
-    model = GPT2LMHeadModel.from_pretrained(trained_model)
+    model = GPT2LMHeadModel.from_pretrained(trained_model, 
+                                            output_hidden_states=True, 
+                                            output_attentions=True,
+                                            pad_token_id=1)
     tokenizer = AutoTokenizer.from_pretrained(trained_model)
     return model, tokenizer
 

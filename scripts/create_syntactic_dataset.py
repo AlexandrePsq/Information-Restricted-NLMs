@@ -1,11 +1,12 @@
 import argparse
 
 import benepar
+import spacy
 from spacy.symbols import ORTH
 
 from irnlm.data.utils import set_nlp_pipeline, get_ids_syntax
 from irnlm.data.extract_syntactic_features import integral2syntactic
-from irnlm.utils import save_pickle
+from irnlm.utils import save_pickle, write
 
 
 nlp = set_nlp_pipeline()
@@ -27,4 +28,6 @@ if __name__=='__main__':
     transform_ids = get_ids_syntax()
 
     syntactic_features = integral2syntactic(path_integral_text, nlp, transform_ids=transform_ids)
+
     save_pickle(args.saving_path, syntactic_features)
+    write(args.saving_path.replace('.pkl', '.txt'), ' '.join([str(i) for i in syntactic_features]))

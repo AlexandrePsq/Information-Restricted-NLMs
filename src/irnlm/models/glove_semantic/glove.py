@@ -4,7 +4,8 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-
+from irnlm.data.text_tokenizer import tokenize
+from irnlm.data.utils import get_function_words
 
 
 def load_model_and_tokenizer(trained_model='../data/glove.6B.300d.txt'):
@@ -16,7 +17,7 @@ def load_model_and_tokenizer(trained_model='../data/glove.6B.300d.txt'):
         - model: dict
         - tokenizer: None
     """
-    if ~os.path.exists(trained_model):
+    if not os.path.exists(trained_model):
         url = "https://nlp.stanford.edu/data/glove.6B.zip"
         output = './data/glove.zip'
         gdown.download(url, output, quiet=False)
@@ -138,16 +139,26 @@ def update_model(glove_model, embedding_size=300):
     return glove_model
 
 def extract_features(
-    words, 
+    path, 
     model, 
+    language='english',
     FEATURE_COUNT=300,
     ):
     """Extract the features from GloVe.
     Args:
-        - words: list of str
+        - path: list of str
         - model: GloVe model
+    Returns:
+        - features: csv
     """
     features = []
+    function_words = get_function_words()
+    iterator = tokenize(path, language=language, with_punctuation=True, convert_numbers=True)
+    iterator = [item.strip() for item in iterator]
+    iterator = [' '.join([word for word in sent.split(' ') if word.lower() not in function_words]) for sent in iterator]
+    iterator = [sent for sent in iterator if sent !='']
+    words = [word for sent in iterator for word in sent.split(' ')]
+
     columns = ['embedding-{}'.format(i) for i in range(1, 1 + FEATURE_COUNT)]
     features = []
     for item in tqdm(words):
