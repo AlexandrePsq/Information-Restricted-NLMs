@@ -1,7 +1,6 @@
 import argparse
 
 import benepar
-import spacy
 from spacy.symbols import ORTH
 
 from irnlm.data.utils import set_nlp_pipeline, get_ids_syntax

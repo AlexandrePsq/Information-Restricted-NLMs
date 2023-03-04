@@ -1,6 +1,6 @@
 import numpy as np
 
-def preference_score(img_sem, img_syn, masker, threshold=4):
+def specificity_index(img_sem, img_syn, masker, threshold=4):
     """ Compute the sensitivity score which is the ratio: np.log10(x_sem/s_syn).
     Args:
         - img_sem:

@@ -16,6 +16,7 @@ from nilearn.image import (
 import matplotlib.pyplot as plt
 
 from fmri_encoder.plotting import compute_surf_proj, create_grid, set_projection_params
+from irnlm.utils import check_folder
 from irnlm.data.utils import fetch_model_maps
 
 
@@ -233,3 +234,56 @@ def plot_group_level_surface_maps(
                 plt.savefig(os.path.join(saving_folder, f'{plot_name}.{format_figure}'), format=format_figure, dpi=dpi, bbox_inches = 'tight', pad_inches = 0, )
                 plt.show()
                 plt.close('all')
+
+def plot_brain_fit(
+        name0, 
+        name1, 
+        vmax=0.1, 
+        cmap='cold_hot', 
+        surname=None, 
+        masker=None, 
+        height_control='fdr', 
+        alpha=0.005,
+        saving_folder=None,
+        show_significant=True,
+    ):
+    """Compute the group level difference between model `name0` and model `name1`.
+    Return significant values and correct for multiple comparison with a FDR 
+    correction of 0.005.
+    Args:
+        - name0: str
+        - name1: str
+        - vmax: float
+        - cmap: str / MatplotlibColorbar
+        - surname: str
+        - masker: NiftiMasker
+        - height_control: str ('fdr', 'bonferroni')
+        - alpha: float
+        - saving_folder: str
+        - show_significant: bool
+    """
+    if surname is None:
+        surname = name0 + '-vs-' + name1
+    # Compute difference at the group level
+    zmaps_dict, effmaps_dict, masks_dict, vmax_list, fdr_th = compute_diff_group_level_maps(name0, name1)
+    zmaps_dict = {surname: list(zmaps_dict.values())[0]}
+    effmaps_dict = {surname: list(effmaps_dict.values())[0]}
+    dict_ = {surname: {'cmap': cmap, 'vmax': vmax}}
+    # If masker look at R scores distribution in the masker
+    if masker is not None:
+        plt.hist(masker.transform(list(effmaps_dict.values())[0]).reshape(-1), bins=200)
+        plt.show()
+    # Plot surface maps
+    saving_folder = os.path.join(saving_folder, surname + f'_z-{height_control}_{fdr_th}')
+    check_folder(saving_folder)
+    plot_group_level_surface_maps(
+        effmaps_dict, 
+        zmaps_dict, 
+        dict_, 
+        ref_img=masker.mask_img_,
+        threshold=1e-15, 
+        height_control=height_control, 
+        alpha=alpha, 
+        saving_folder=saving_folder
+    )
+    return effmaps_dict, zmaps_dict

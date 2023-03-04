@@ -18,7 +18,7 @@ python -m spacy download en_core_web_lg-3.0.0 --direct # this is the version tha
 ## Training data: the Integral Dataset
 
 The Integral Dataset (train, test and dev) is directly available at https://osf.io/jzcvu/
-The following steps can regenerate it (computatinoal expensive...)
+The following steps can regenerate it (computationally expensive...)
 
 ### Cleaning data
 
@@ -105,6 +105,7 @@ cd src/irnlm/models/glove_syntactic/
 
 # Train GPT-2
 
+TODO
 ```shell
 # GPT-2 Integral
 python src/irnlm/models/gpt2/train.py --yaml_file src/irnlm/models/gpt2/templates/lm_template4_full.yml
@@ -157,6 +158,7 @@ python scripts/extract_features.py  --path data/train.txt \
 
 # Extract features from GPT-2
 
+TODO
 ```shell
 python scripts/extract_features.py  --path data/train.txt \
                                     --model gpt2 \
@@ -184,7 +186,7 @@ However, if you want to use the same code that was used in the paper, you should
 The code might be more abstract (as it implements several classes) and slower (as it performs a nested-cross validation).
 
 ```shell
-# You shoudl first fill the template `yaml_file`depending on the features you want to use 
+# You shoudl first fill the template `--yaml_file` depending on the features you want to use 
 # and your choice of hyperparameters .
 python src/irnlm/encoding_pipeline/main.py --yaml_file src/irnlm/encoding_pipeline/template.yml
 ```

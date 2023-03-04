@@ -4,10 +4,10 @@ parallel: False
 cuda: True
 seed: 1111
 language: english
-path_to_root: "/neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/"
-path_to_fmridata: "/neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/fMRI"
-output: "/neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/derivatives/fMRI/maps/"  # Path to the output folder
-input: "/neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/stimuli-representations/"  # Path to the folder containing the representations
+path_to_root: "/[path_to]/Information-Restrited-NLMs/"
+path_to_fmridata: "/[path_to]/Information-Restrited-NLMs/data/fMRI"
+output: "/[path_to]/Information-Restrited-NLMs/derivatives/fMRI/maps/"  # Path to the output folder
+input: "/[path_to]/Information-Restrited-NLMs/data/stimuli-representations/"  # Path to the folder containing the representations
 detrend: True
 standardize: True
 high_pass: 
@@ -33,11 +33,12 @@ manifold_args:  # linkage: ('ward', 'average', 'complete', 'single'),
 tr: 2.
 scaling_mean: True
 scaling_var: True
-scaling_axis: 1
+scaling_axis: 0
 hrf: spm
-offset_path: "/neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/onsets-offsets/"
-duration_path: "/neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/"
+offset_path: "/[path_to]/Information-Restrited-NLMs/data/onsets-offsets/"
+duration_path: "/[path_to]/Information-Restrited-NLMs/"
 temporal_shifting: 0
+oversampling: 10
 add_noise_to_constant: True
 
 # Shared Estimator model parameters
@@ -45,16 +46,16 @@ base: 10.0
 voxel_wise: True
 alpha_percentile: 99.9
 alpha:
-alpha_min_log_scale: 2
-alpha_max_log_scale: 5
+alpha_min_log_scale: -3
+alpha_max_log_scale: 4
 nb_alphas: 10
 optimizing_criteria: R2
 estimator_model: Ridge()
 
 # Maps creation parameters
 atlas: cort-prob-2mm
-masker_path: "/neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/global_masker_english"
-smoothed_masker_path: "/neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/smoothed_global_masker_english"
+masker_path: "/[path_to]/Information-Restrited-NLMs/derivatives/fMRI/ROI_masks/global_masker_english"
+smoothed_masker_path: "/[path_to]/Information-Restrited-NLMs/derivatives/fMRI/ROI_masks/smoothed_global_masker_english"
 
 
 # Models
@@ -83,15 +84,4 @@ models:
     centering: True
     order: 2
     scaling_type: normalize
-  - model_name: wordrate_all_model
-    columns_to_retrieve: "[3]"
-    surname: unigram
-    data_compression: 
-    ncomponents: 
-    offset_type: 'word' # word / word+punctuation / ...
-    duration_type: 
-    shift_surprisal: False
-    centering:
-    order:
-    scaling_type:
 model_name: BERT-L11-12+Wordrate
