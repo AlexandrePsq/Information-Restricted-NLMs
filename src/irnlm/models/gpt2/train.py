@@ -19,7 +19,8 @@ from transformers import (
     GPT2Config
 )
 
-from irnlm.models.gpt2.modeling_hacked_gpt2 import GPT2LMHeadModel
+from irnlm.models.gpt2.modeling_hacked_gpt2_integral import GPT2LMHeadModel
+from irnlm.models.gpt2.modeling_hacked_gpt2_semantic import GPT2LMHeadModel as GPT2LMHeadModelSemantic
 from irnlm.models.gpt2.language_modeling import LMDataset, LMProcessor
 from irnlm.utils import (
     read_yaml, 
@@ -33,7 +34,7 @@ from irnlm.models.utils import (
     save_checkpoint
 )
 from irnlm.models.gpt2.processors import ModelProcessor
-
+from irnlm.models.tokenizer import read_bpe
 
 
 ########################################################################################################
@@ -70,37 +71,40 @@ if __name__=='__main__':
         processor = LMProcessor(parameters['max_length'], device=device, output_dir=parameters['output_dir'], dataset_name=parameters['dataset_name'], dataset_dir=parameters['dataset_dir'], context_size=parameters['context_size'], extra=parameters['extra'], n_splits=nb_splits)
     logging.info("\tDone.")
 
-    logging.info("Fetching pre-trained GPT-2 model: {} and Tokenizer: {} for the task: {}...".format(parameters['pretrained_model'],parameters['pretrained_tokenizer'],parameters['task']))
+    logging.info(f"Fetching GPT-2 model for the task: {parameters['task']}...")
     if task in ['language-modeling']:
         if parameters['start_from_scratch']:
             params = read_yaml(parameters['config_path'])
             params['layer_norm_epsilon'] = float(params['layer_norm_epsilon'])
-            model = GPT2LMHeadModel(GPT2Config(**params))
+            if parameters['model_type'] in ['integral', 'syntactic']:
+                model = GPT2LMHeadModel(GPT2Config(**params))
+            elif parameters['model_type'] == 'semantic':
+                model = GPT2LMHeadModelSemantic(GPT2Config(**params))
         else:
-            model = GPT2LMHeadModel.from_pretrained(
-                        parameters['pretrained_model'],
-                        output_attentions=parameters['output_attentions'], # Whether the model returns attentions weights.
-                        output_hidden_states=parameters['output_hidden_states'], # Whether the model returns all hidden-states.
-            )
-    if parameters['tokenizer_from_scratch']:
-        tokenizer = ByteLevelBPETokenizer( 
-                        lowercase=parameters['lowercase'])
-        files = [os.path.join(parameters['dataset_dir'], item) for item in ['gpt2_train.txt', 'gpt2_test.txt', 'gpt2_dev.txt']]
-        tokenizer.train( 
-                        files, 
-                        vocab_size=parameters['vocab_size'], 
-                        min_frequency=parameters['min_frequency'], 
-                        show_progress=True, 
-                        special_tokens=["<s>", "<pad>", "</s>", "<unk>", "<mask>"])
-        #tokenizer.enable_truncation(max_length=512)
-        #tokenizer.save_model(os.path.join(parameters['output_dir'], parameters['dataset_name'] + 'tokenizer'))
-        #tokenizer.save(os.path.join(parameters['output_dir'], parameters['dataset_name'] + 'tokenizer', 'tokenizer.json'))
-        #tokenizer.save_pretrained(os.path.join(parameters['output_dir'], parameters['dataset_name'] + 'tokenizer'))
-        print(tokenizer.encode("<s> The dog ran <mask> outside . <unk> </s> <pad>").tokens) # --> ['<s>', 'Ġ', '<mask>', 'Ġ.', 'Ġ', '<unk>', 'Ġ', '</s>', 'Ġ', '<pad>']
-        print(tokenizer.encode("<s> <mask> . <unk> </s> <pad>").ids) # --> [0, 225, 4, 272, 225, 3, 225, 2, 225, 1]
+            if parameters['model_type'] in ['integral', 'syntactic']:
+                model = GPT2LMHeadModel.from_pretrained(
+                            parameters['pretrained_model'],
+                            output_attentions=parameters['output_attentions'], # Whether the model returns attentions weights.
+                            output_hidden_states=parameters['output_hidden_states'], # Whether the model returns all hidden-states.
+                )
+            elif parameters['model_type'] == 'semantic':
+                model = GPT2LMHeadModelSemantic.from_pretrained(
+                            parameters['pretrained_model'],
+                            output_attentions=parameters['output_attentions'], # Whether the model returns attentions weights.
+                            output_hidden_states=parameters['output_hidden_states'], # Whether the model returns all hidden-states.
+                )
+
+    logging.info("Fetching Tokenizer...")
+    if parameters['pretrained_tokenizer'] is not None:
+        tokenizer = GPT2Tokenizer.from_pretrained(parameters['pretrained_tokenizer'])
     else:
-        tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
-        #tokenizer = Tokenizer.from_file(os.path.join(parameters['output_dir'], parameters['dataset_name'] + 'tokenizer', 'tokenizer.json'))
+        tokenizer = read_bpe(  
+                    path=parameters['tokenizer_path'],   
+                    max_length=parameters['max_length'], #max_length  
+                    training_data_paths=parameters['tokenizer_training_data_paths'],  
+                    vocab_size=parameters['vocab_size'], 
+                    special_tokens=parameters['tokenizer_special_tokens'],  
+                )
         
     processor.set_tokenizer(tokenizer)
     
@@ -164,11 +168,18 @@ if __name__=='__main__':
         else:
             path = sorted(glob.glob(os.path.join(parameters['output_dir'], 'fine_tuned*')))[-1]
             print(f'Using model saved at: {path}...')
-            model_processor.model = GPT2LMHeadModel.from_pretrained(
-                            path,
-                            output_attentions=parameters['output_attentions'], # Whether the model returns attentions weights.
-                            output_hidden_states=parameters['output_hidden_states'], # Whether the model returns all hidden-states.
-            )
+            if parameters['model_type'] in ['integral', 'syntactic']:
+                model_processor.model = GPT2LMHeadModel.from_pretrained(
+                                path,
+                                output_attentions=parameters['output_attentions'], # Whether the model returns attentions weights.
+                                output_hidden_states=parameters['output_hidden_states'], # Whether the model returns all hidden-states.
+                )
+            elif parameters['model_type'] == 'semantic':
+                model_processor.model = GPT2LMHeadModelSemantic.from_pretrained(
+                                path,
+                                output_attentions=parameters['output_attentions'], # Whether the model returns attentions weights.
+                                output_hidden_states=parameters['output_hidden_states'], # Whether the model returns all hidden-states.
+                )
             model_processor.model.to(device)
             training_stats = pd.read_csv(os.path.join(parameters['output_dir'], 'training_stats.csv'))
             

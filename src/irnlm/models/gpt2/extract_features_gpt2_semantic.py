@@ -2,64 +2,17 @@ import os
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
-from collections import defaultdict
 
 import torch
-from transformers import AutoTokenizer
 
 from irnlm.data.text_tokenizer import tokenize
-from irnlm.models.gpt2.modeling_hacked_gpt2 import GPT2LMHeadModel
+from irnlm.data.utils import get_function_words
+from irnlm.models.gpt2.extract_features_gpt2_integral import create_examples
 
-
-def load_model_and_tokenizer(trained_model='gpt2'):
-    """Load a HuggingFace model and the associated tokenizer given its name.
-    Args:
-        - trained_model: str
-    Returns:    
-        - model: HuggingFace model
-        - tokenizer: HuggingFace tokenizer
-    """
-    model = GPT2LMHeadModel.from_pretrained(trained_model, 
-                                            output_hidden_states=True, 
-                                            output_attentions=True,
-                                            pad_token_id=50256)
-    tokenizer = AutoTokenizer.from_pretrained(trained_model)
-    return model, tokenizer
-
-def pad_to_max_length(sequence, max_seq_length, space=220, special_token_end=50256):
-    """Pad sequence to reach max_seq_length
-    Args:
-        - sequence: list of int
-        - max_seq_length: int
-        - space: int (default 220)
-        - special_token_end: int (default 50256)
-    Returns:
-        - result: list of int
-    """
-    sequence = sequence[:max_seq_length]
-    n = len(sequence)
-    result = sequence + [space, special_token_end] * ((max_seq_length - n)// 2)
-    if len(result)==max_seq_length:
-        return result
-    else:
-        return result + [space]
-
-def create_examples(sequence, max_seq_length, space=220, special_token_beg=50256, special_token_end=50256):
-    """Returns list of InputExample objects.
-    Args:
-        - sequence: list of int
-        - max_seq_length: int
-        - space: int (default 220)
-        - special_token_beg: int (default 50256)
-        - special_token_end: int (default 50256)
-    Returns:
-        - result: list of int
-    """
-    return pad_to_max_length([special_token_beg] + sequence + [space, special_token_end], max_seq_length)
 
 def batchify_to_truncated_input(
     iterator, 
-    tokenizer, 
+    nlp_tokenizer, 
     context_size=None, 
     max_seq_length=512, 
     space='Ġ', 
@@ -70,7 +23,7 @@ def batchify_to_truncated_input(
     Function used with 'get_truncated_activations'.
     Arguments:
         - iterator: sentence str
-        - tokenizer: Tokenizer object
+        - nlp_tokenizer: Tokenizer object
         - context_size: int
         - max_seq_length: int
         - space: str (default 'Ġ')
@@ -83,18 +36,29 @@ def batchify_to_truncated_input(
     max_seq_length = max_seq_length if context_size is None else context_size+5 # +5 because of the special tokens + the current and following tokens
     os.environ["TOKENIZERS_PARALLELISM"] = "true"
     try:
-        data = tokenizer.encode(iterator).ids
-        text =  tokenizer.encode(iterator).tokens
+        data = nlp_tokenizer.encode(iterator).ids
+        text =  nlp_tokenizer.encode(iterator).tokens
     except:
-        data = tokenizer.encode(iterator)
-        text =  tokenizer.tokenize(iterator)
+        data = nlp_tokenizer.encode(iterator)
+        text =  nlp_tokenizer.tokenize(iterator)
 
     if context_size==0:
         examples = [create_examples(data[i:i + 2], max_seq_length) for i, _ in enumerate(data)]
-        tokens = [create_examples(text[i:i + 2], max_seq_length, space=space, special_token_beg=special_token_beg, special_token_end=special_token_end) for i, _ in enumerate(text)]
+        tokens = [create_examples(
+            text[i:i + 2], 
+            max_seq_length, 
+            space=space, 
+            special_token_beg=special_token_beg, 
+            special_token_end=special_token_end
+            ) for i, _ in enumerate(text)]
     else:
         examples = [create_examples(data[i:i + context_size + 2], max_seq_length) for i, _ in enumerate(data[:-context_size])]
-        tokens = [create_examples(text[i:i + context_size + 2], max_seq_length, space=space, special_token_beg=special_token_beg, special_token_end=special_token_end) for i, _ in enumerate(text[:-context_size])]
+        tokens = [create_examples(
+            text[i:i + context_size + 2], 
+            max_seq_length, space=space, 
+            special_token_beg=special_token_beg, 
+            special_token_end=special_token_end
+            ) for i, _ in enumerate(text[:-context_size])]
     # the last example in examples has one element less from the input data, but it is compensated by the padding. we consider that the element following the last input token is the special token.
     features = [torch.FloatTensor(example).unsqueeze(0).to(torch.int64) for example in examples]
     input_ids = torch.cat(features, dim=0)
@@ -104,34 +68,10 @@ def batchify_to_truncated_input(
     del features
     return input_ids, indexes, tokens
 
-def match_tokenized_to_untokenized(tokenized_sent, untokenized_sent, connection_character='Ġ', eos_token='<|endoftext|>'):
-    '''Aligns tokenized and untokenized sentence given non-subwords "Ġ" prefixed
-    Assuming that each subword token that does start a new word is prefixed
-    by "Ġ", computes an alignment between the un-subword-tokenized
-    and subword-tokenized sentences.
-    Args:
-        tokenized_sent: a list of strings describing a subword-tokenized sentence
-        untokenized_sent: a list of strings describing a sentence, no subword tok.
-    Returns:
-        A dictionary of type {int: list(int)} mapping each untokenized sentence
-        index to a list of subword-tokenized sentence indices
-    '''
-    mapping = defaultdict(list)
-    untokenized_sent_index = 0
-    tokenized_sent_index = 0
-    while (untokenized_sent_index < len(untokenized_sent) and tokenized_sent_index < len(tokenized_sent)):
-        while (tokenized_sent_index + 1  < len(tokenized_sent) and (not tokenized_sent[tokenized_sent_index + 1].startswith(connection_character)) and tokenized_sent[tokenized_sent_index+1]!=eos_token):
-            mapping[untokenized_sent_index].append(tokenized_sent_index)
-            tokenized_sent_index += 1
-        mapping[untokenized_sent_index].append(tokenized_sent_index)
-        untokenized_sent_index += 1
-        tokenized_sent_index += 1
-    return mapping
-
 def extract_features(
     path, 
     model, 
-    tokenizer, 
+    nlp_tokenizer, 
     context_size=100, 
     max_seq_length=512, 
     space='Ġ', 
@@ -146,17 +86,21 @@ def extract_features(
     Args:
         - path: str
         - model: HuggingFace model
-        - tokenizer: HuggingFace tokenizer
+        - nlp_tokenizer: HuggingFace tokenizer
     """
     features = []
+    function_words = get_function_words()
     iterator = tokenize(path, language=language, with_punctuation=True, convert_numbers=True)
     iterator = [item.strip() for item in iterator]
-    
-    tokenized_text = tokenizer.tokenize(iterator)
-    mapping = match_tokenized_to_untokenized(tokenized_text, iterator)
-    
+    iterator = [' '.join([word for word in sent.split(' ') if word.lower() not in function_words]) for sent in iterator]
+    iterator = [item for item in iterator if item !='']
+
+    ids = nlp_tokenizer(iterator).word_ids() 
+    unique_ids = np.unique(ids) 
+    mapping = {i: list(np.where(ids==i)[0]) for i in unique_ids}  #match_tokenized_to_untokenized(tokenized_text, iterator)
+
     input_ids, indexes, tokens = batchify_to_truncated_input(
-        iterator, tokenizer, 
+        iterator, nlp_tokenizer, 
         context_size=context_size, 
         max_seq_length=max_seq_length, 
         space=space, special_token_beg=special_token_beg, 
@@ -187,5 +131,5 @@ def extract_features(
     #After vstacking it will be of shape: (batch_size, #nb_layers*hidden_state_dimension)
         
     features = pd.DataFrame(np.vstack(features), columns=['hidden_state-layer-{}-{}'.format(layer, index) for layer in np.arange(1 + NUM_HIDDEN_LAYERS) for index in range(1, 1 + FEATURE_COUNT)])
-    
+
     return features

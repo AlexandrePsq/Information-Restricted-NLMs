@@ -56,13 +56,11 @@ class LMProcessor(DataProcessor):
 
     def get_data(self, set_type):
         """See base class."""
-        if all([os.path.exists(os.path.join(self.dataset_dir, f'{self.dataset_name}{self.extra}{set_type}_all-ids_split-{index_split}.pkl')) for index_split in range(self.n_splits)]):
-            paths = [os.path.join(self.dataset_dir, f'{self.dataset_name}{self.extra}{set_type}_all-ids_split-{index_split}.pkl') for index_split in range(self.n_splits)]
-
+        paths = [os.path.join(self.dataset_dir, f'{self.dataset_name}{self.extra}{set_type}_all-ids_split-{index_split}.pkl') for index_split in range(self.n_splits)]
+        if all([os.path.exists(p) for p in paths]):
+            return paths
         else:
-            tmp = [os.path.exists(os.path.join(self.dataset_dir, f'{self.dataset_name}{self.extra}{set_type}_all-ids_split-{index_split}.pkl')) for index_split in range(self.n_splits)]
-            raise NotImplementedError("Dataset not defined: ", tmp)
-        return paths
+            raise NotImplementedError("Dataset not defined: ", paths)
     
     def set_tokenizer(self, tokenizer):
         """Set processor tokenizer."""
@@ -80,39 +78,6 @@ class LMProcessor(DataProcessor):
         with open(filename, 'rb') as inp:  # Overwrites any existing file.
             data = pickle.load(inp)
         return data
-    
-    def create_examples(self, sequence):
-        """Returns list of InputExample objects."""
-        #input_id = self.pad_to_max_length([0] + sequence + [1, 2]) ### HERE ###
-        input_id = self.pad_to_max_length([50256] + sequence + [220, 50256])
-        #attention_mask = self.pad_attention_to_max_length([1] + sequence + [1, 1])
-        return input_id #, attention_mask
-
-    def pad_to_max_length(self, sequence):
-        """Pad sequence to reach max_seq_length"""
-        n = len(sequence)
-        if n==self.max_seq_length:
-            return sequence
-        else:
-            print(f'Careful - {sequence} - is not of {len(sequence)} (!= max length)... Padding...')
-            sequence = sequence[:self.max_seq_length]
-            #result = sequence + [1] * ((self.max_seq_length - n)// 2) ### HERE ###
-            result = sequence + [220, 50256] * ((self.max_seq_length - n)// 2)
-            if len(result)==self.max_seq_length:
-                return result
-            else:
-                #return result + [1] ### HERE ###
-                return result + [220]
-        
-    def pad_attention_to_max_length(self, sequence):
-        """Pad sequence to reach max_seq_length"""
-        sequence = sequence[:self.max_seq_length]
-        n = len(sequence)
-        result = [1 for _ in sequence] + [0, 0] * ((self.max_seq_length - n)// 2)
-        if len(result)==self.max_seq_length:
-            return result
-        else:
-            return result + [0]
     
     def get_data_loader(self, features_path, batch_size, local_rank, set_type):
         """See base class."""

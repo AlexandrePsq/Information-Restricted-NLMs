@@ -1,4 +1,5 @@
 import os
+import re
 import glob
 import torch
 import random
@@ -6,9 +7,9 @@ import numpy as np
 from transformers import GPT2LMHeadModel, WEIGHTS_NAME, CONFIG_NAME
 
 
-from irnlm.models.gpt2.modeling_hacked_gpt2 import GPT2LMHeadModel
-from irnlm.models.gpt2_semantic.modeling_hacked_gpt2 import GPT2LMHeadModel as GPT2LMHeadModelSemantics
-from irnlm.models.gpt2_syntactic.modeling_hacked_gpt2 import GPT2LMHeadModel as GPT2LMHeadModelSyntax
+from irnlm.models.gpt2.modeling_hacked_gpt2_integral import GPT2LMHeadModel
+from irnlm.models.gpt2.modeling_hacked_gpt2_semantic import GPT2LMHeadModel as GPT2LMHeadModelSemantics
+from irnlm.models.gpt2.modeling_hacked_gpt2_syntactic import GPT2LMHeadModel as GPT2LMHeadModelSyntax
 
 
 
@@ -56,7 +57,7 @@ def sort_nicely(l):
     """
     l.sort(key=alphanum_key)
 
-def load_last_checkpoint(parameters, model=None, gpt2_type='default'):
+def load_last_checkpoint(parameters, model=None, gpt2_type='integral'):
     """Load the last saved model in case it has crashed...
     Args:
         - parameters: dict
@@ -79,7 +80,7 @@ def load_last_checkpoint(parameters, model=None, gpt2_type='default'):
         start_at_dataloader = os.path.basename(path_loader[-1]).split('epoch-')[-1].split('_split-')[-1]            
 
     try:
-        if gpt2_type=='default':
+        if gpt2_type=='integral':
             model = GPT2LMHeadModel.from_pretrained(
                             path,
                             output_attentions=parameters['output_attentions'], # Whether the model returns attentions weights.

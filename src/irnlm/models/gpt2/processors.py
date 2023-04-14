@@ -12,7 +12,7 @@ from torch.utils.data import TensorDataset
 from torch.utils.data import DataLoader, RandomSampler
 
 from irnlm.models.utils import save_checkpoint, format_time
-
+from irnlm.models.gpt2.extract_features_gpt2_integral import create_examples, pad_to_max_length
 from irnlm.utils import get_timestamp, check_folder
 
 
@@ -129,6 +129,19 @@ class ModelProcessor(object):
         validation data loaders.
         Returns loss statistics from training and evaluations.
         """
+        special_token_beg = self.tokenizer.bos_token
+        special_token_end = self.tokenizer.eos_token
+        special_token_beg_ids = self.tokenizer(self.tokenizer.bos_token)['input_ids'][0]
+        special_token_end_ids = self.tokenizer(self.tokenizer.eos_token)['input_ids'][0]
+        try:
+            special_token_pad = self.tokenizer.pad_token
+            special_token_pad_ids = self.tokenizer(self.tokenizer.pad_token)['input_ids'][0]
+            space = None
+        except ValueError:
+            special_token_pad = None
+            special_token_pad_ids = None
+            space = 220
+            
         training_stats = []
         validation_stats = []
         logging.basicConfig(filename=os.path.join(parameters['output_dir'], parameters['log_file']), filemode='w+', level=logging.INFO)
@@ -162,7 +175,7 @@ class ModelProcessor(object):
                     self.model.train()
 
                     for split_index, batch_path in enumerate(train_data_paths):
-                        if (split_index > start_at_dataloader-1) or (start_at_dataloader+1==len(train_data_paths)):
+                        if (split_index >= start_at_dataloader) or (start_at_dataloader+1==len(train_data_paths)):
                             start_at_dataloader = 0
                             logging.info(f"[{get_timestamp()}] - Creating training data loader for split {split_index}..")
                             data = data_processor.load_object(batch_path)
@@ -172,9 +185,23 @@ class ModelProcessor(object):
                             print('------- No data augmentation -------')
                             #examples_ids, examples_masks = list(zip(*[data_processor.create_examples(data[i*self.context_size:min((i+1)*self.context_size + 2, n)]) for i in tqdm(range(n//self.context_size))]))
                             if self.context_size==0:
-                                examples_ids = [data_processor.create_examples(data[2*i:2*(i+1)]) for i in tqdm(range(n//2))]
+                                examples_ids = [create_examples(
+                                                    data[2*i:2*(i+1)],
+                                                    parameters['max_length'],
+                                                    space=space, 
+                                                    special_token_beg=special_token_beg, 
+                                                    special_token_end=special_token_end, 
+                                                    special_token_pad=special_token_pad
+                                                ) for i in tqdm(range(n//2))]
                             else:
-                                examples_ids = [data_processor.create_examples(data[i*self.context_size:min((i+1)*self.context_size + 2, n)]) for i in tqdm(range(n//self.context_size))]
+                                examples_ids = [create_examples(
+                                                    data[i*self.context_size:min((i+1)*self.context_size + 2, n)],
+                                                    parameters['max_length'],
+                                                    space=space, 
+                                                    special_token_beg=special_token_beg, 
+                                                    special_token_end=special_token_end, 
+                                                    special_token_pad=special_token_pad
+                                                ) for i in tqdm(range(n//self.context_size))]
                             features = [torch.FloatTensor(example).unsqueeze(0).to(torch.int64) for example in tqdm(examples_ids)]
                             #masks = [torch.FloatTensor(mask).unsqueeze(0).to(torch.int64) for mask in tqdm(examples_masks)]
                             input_ids = torch.cat(features, dim=0)
@@ -220,8 +247,8 @@ class ModelProcessor(object):
                             save_checkpoint(self.model, self.tokenizer, output_dir, f'end-epoch-{epoch_i}_split-{split_index}')
                             logging.info("\tDone.")
                         else:
-                            print(f"Skipping loader #{split_index}.")
-                            logging.info(f"Skipping loader #{split_index}.")
+                            print(f"Skipping dataloader #{split_index}.")
+                            logging.info(f"Skipping dataloader #{split_index}.")
                     # Calculate the average loss over all of the batches.
                     avg_train_loss = total_train_loss / nb_batchs_done           
                     # Measure how long this epoch took.
@@ -292,6 +319,19 @@ class ModelProcessor(object):
     def evaluate(self, data_processor, validation_features_paths, set_type, parameters):
         """ Evaluate a model on a validation dataloader.
         """
+        special_token_beg = self.tokenizer.bos_token
+        special_token_end = self.tokenizer.eos_token
+        special_token_beg_ids = self.tokenizer(self.tokenizer.bos_token)['input_ids'][0]
+        special_token_end_ids = self.tokenizer(self.tokenizer.eos_token)['input_ids'][0]
+        try:
+            special_token_pad = self.tokenizer.pad_token
+            special_token_pad_ids = self.tokenizer(self.tokenizer.pad_token)['input_ids'][0]
+            space = None
+        except ValueError:
+            special_token_pad = None
+            special_token_pad_ids = None
+            space = 220
+            
         print("Creating temporary folder...")
         check_folder(os.path.join(parameters['output_dir'], 'tmp'))
         print("Running Validation...")
@@ -316,9 +356,22 @@ class ModelProcessor(object):
             n = len(data)
             #examples_ids, examples_masks = list(zip(*[data_processor.create_examples(data[i*self.context_size:min((i+1)*self.context_size + 2, n)]) for i in tqdm(range(n//self.context_size))]))
             if self.context_size==0:
-                examples_ids = [data_processor.create_examples(data[2*i:2*(i+1)]) for i in tqdm(range(n//2))]
+                examples_ids = [create_examples(
+                                    data[2*i:2*(i+1)],
+                                    parameters['max_length'],
+                                    space=space, 
+                                    special_token_beg=special_token_beg, 
+                                    special_token_end=special_token_end, 
+                                    special_token_pad=special_token_pad
+                                ) for i in tqdm(range(n//2))]
             else:
-                examples_ids = [data_processor.create_examples(data[i*self.context_size:min((i+1)*self.context_size + 2, n)]) for i in tqdm(range(n//self.context_size))]
+                examples_ids = [create_examples(
+                                    data[i*self.context_size:min((i+1)*self.context_size + 2, n)],
+                                    space=space, 
+                                    special_token_beg=special_token_beg, 
+                                    special_token_end=special_token_end, 
+                                    special_token_pad=special_token_pad
+                                ) for i in tqdm(range(n//self.context_size))]
             features = [torch.FloatTensor(example).unsqueeze(0).to(torch.int64) for example in tqdm(examples_ids)]
             #masks = [torch.FloatTensor(mask).unsqueeze(0).to(torch.int64) for mask in tqdm(examples_masks)]
             input_ids = torch.cat(features, dim=0)
