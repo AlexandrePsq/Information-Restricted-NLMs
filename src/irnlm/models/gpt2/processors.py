@@ -189,18 +189,18 @@ class ModelProcessor(object):
                                                     data[2*i:2*(i+1)],
                                                     parameters['max_length'],
                                                     space=space, 
-                                                    special_token_beg=special_token_beg, 
-                                                    special_token_end=special_token_end, 
-                                                    special_token_pad=special_token_pad
+                                                    special_token_beg=special_token_beg_ids, 
+                                                    special_token_end=special_token_end_ids, 
+                                                    special_token_pad=special_token_pad_ids
                                                 ) for i in tqdm(range(n//2))]
                             else:
                                 examples_ids = [create_examples(
                                                     data[i*self.context_size:min((i+1)*self.context_size + 2, n)],
                                                     parameters['max_length'],
                                                     space=space, 
-                                                    special_token_beg=special_token_beg, 
-                                                    special_token_end=special_token_end, 
-                                                    special_token_pad=special_token_pad
+                                                    special_token_beg=special_token_beg_ids, 
+                                                    special_token_end=special_token_end_ids, 
+                                                    special_token_pad=special_token_pad_ids
                                                 ) for i in tqdm(range(n//self.context_size))]
                             features = [torch.FloatTensor(example).unsqueeze(0).to(torch.int64) for example in tqdm(examples_ids)]
                             #masks = [torch.FloatTensor(mask).unsqueeze(0).to(torch.int64) for mask in tqdm(examples_masks)]
@@ -360,17 +360,17 @@ class ModelProcessor(object):
                                     data[2*i:2*(i+1)],
                                     parameters['max_length'],
                                     space=space, 
-                                    special_token_beg=special_token_beg, 
-                                    special_token_end=special_token_end, 
-                                    special_token_pad=special_token_pad
+                                    special_token_beg=special_token_beg_ids, 
+                                    special_token_end=special_token_end_ids, 
+                                    special_token_pad=special_token_pad_ids
                                 ) for i in tqdm(range(n//2))]
             else:
                 examples_ids = [create_examples(
                                     data[i*self.context_size:min((i+1)*self.context_size + 2, n)],
                                     space=space, 
-                                    special_token_beg=special_token_beg, 
-                                    special_token_end=special_token_end, 
-                                    special_token_pad=special_token_pad
+                                    special_token_beg=special_token_beg_ids, 
+                                    special_token_end=special_token_end_ids, 
+                                    special_token_pad=special_token_pad_ids
                                 ) for i in tqdm(range(n//self.context_size))]
             features = [torch.FloatTensor(example).unsqueeze(0).to(torch.int64) for example in tqdm(examples_ids)]
             #masks = [torch.FloatTensor(mask).unsqueeze(0).to(torch.int64) for mask in tqdm(examples_masks)]

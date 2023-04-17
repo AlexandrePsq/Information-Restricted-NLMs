@@ -11,20 +11,20 @@
 # General
 task: language-modeling # Task on which to fine-tune the model ['POS-tagging', 'NER', 'sentiment-analysis', 'sentence-classification', 'mask-language-modeling]
 seed: 1111 # Seed for reproductibility
-output_dir: /neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/derivatives/fMRI/models/english/GPT-2/GPT-2_L-4_H-768_default_tokenizer_full
+output_dir: /neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/derivatives/fMRI/models/french/irnlm/GPT-2/GPT-2_L-4_H-768_integral
 log_file: logs_validation.txt
 local_rank: -1
-do_test: True
+do_test: False
 do_train: True
-do_validation: True
+do_validation: False
 metric_name: classification
 
 # Datasets
-dataset_name: 'gpt2_'
-extra: 'default-tokenizer_'
-dataset_dir: "/neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/english/all_training" # Path/URL to the folder containing the dataset to use for fine-tuning
+dataset_name: 'CC100_integral_' # 'gpt2_'
+extra: '' # 'default-tokenizer_'
+dataset_dir: "/neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/french/training_data" #english/all_training" # Path/URL to the folder containing the dataset to use for fine-tuning
 use_output_mask: False # for token classification
-nb_splits: 5 #10 for french
+nb_splits: 10 #5 for french
 
 # Data Loader
 train_size_percentage: 0.9
@@ -33,20 +33,27 @@ batch_size_eval: 64
 
 # Model & Tokenizer
 model_type: integral
-pretrained_model: gpt2 # Name of (or path to) the pre-trained BERT model to use
-pretrained_tokenizer: gpt2 # Name of (or path to) the pre-trained BERT tokenizer to use
-config_path: "/neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/models/english/gpt2_L-4_H-768_A-12/config.json"
+pretrained_model:    # gpt2 # Name of (or path to) the pre-trained BERT model to use
+pretrained_tokenizer:   # gpt2 # Name of (or path to) the pre-trained BERT tokenizer to use
+config_path: "/neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/Information-Restrited-NLMs/src/irnlm/models/gpt2/configs/gpt2_L-4_H-768_A-12_integral/config.json"
 tokenizer_training_data_paths: 
-  - "/neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/english/all_training/gpt2_train.txt"
-  - "/neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/english/all_training/gpt2_test.txt"
-  - "/neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/english/all_training/gpt2_dev.txt"
+  - "/neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/french/training_data/training_data.000"
+  - "/neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/french/training_data/training_data.001"
+  - "/neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/french/training_data/training_data.002"
+  - "/neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/french/training_data/training_data.003"
+  - "/neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/french/training_data/training_data.004"
+  - "/neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/french/training_data/training_data.005"
+  - "/neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/french/training_data/training_data.006"
+  - "/neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/french/training_data/training_data.007"
+  - "/neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/french/training_data/training_data.008"
+  - "/neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/french/training_data/training_data.009"
 tokenizer_special_tokens:
-  - "<s>" # "[CLS]"
   - "<pad>" # "[PAD]"
+  - "<s>" # "[CLS]"
   - "</s>" # "[SEP]"
   - "<unk>" # "[UNK]"
   - "<mask>" # "[MASK]"
-tokenizer_path: "/neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/french/training_data/"
+tokenizer_path: "/neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/french/training_data/integral"
 output_attentions: True
 output_hidden_states: True
 max_length: 512
@@ -70,6 +77,6 @@ num_warmup_steps: 0 # Default value in run_glue.py
 
 # Training
 nb_epochs: 3 # BERT authors recommended between 2 and 4
-nb_checkpoints: 30 # number of checkpoints at which to save model state
+nb_checkpoints: 10 # number of checkpoints at which to save model state
 start_epoch: 0
 init_checkpoints: 1
