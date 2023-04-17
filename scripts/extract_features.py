@@ -7,11 +7,9 @@ from irnlm.models.glove_semantic.glove import load_model_and_tokenizer as load_g
 from irnlm.models.glove_syntactic.glove import extract_features as glove_syn_extractor
 from irnlm.models.glove_syntactic.glove import load_model_and_tokenizer as load_glove_syn
 from irnlm.models.gpt2.extract_features_gpt2_integral import extract_features as gpt2_int_extractor
-from irnlm.models.gpt2.extract_features_gpt2_integral import load_model_and_tokenizer as load_gpt2_int
+from irnlm.models.gpt2.extract_features_gpt2_integral import load_model_and_tokenizer as load_gpt2
 from irnlm.models.gpt2.extract_features_gpt2_semantic import extract_features as gpt2_sem_extractor
-from irnlm.models.gpt2.extract_features_gpt2_semantic import load_model_and_tokenizer as load_gpt2_sem
 from irnlm.models.gpt2.extract_features_gpt2_syntactic import extract_features as gpt2_syn_extractor
-from irnlm.models.gpt2.extract_features_gpt2_syntactic import load_model_and_tokenizer as load_gpt2_syn
 from irnlm.utils import filter_args
 
 extractor_dict = {
@@ -28,9 +26,9 @@ extractor_dict = {
 }
 model_tokenizer_dict = {
     'gpt2': {
-        'integral': load_gpt2_int,
-        'semantic': load_gpt2_sem,
-        'syntactic': load_gpt2_syn,
+        'integral': lambda x: load_gpt2(trained_model=x, model_type='integral'),
+        'semantic': lambda x: load_gpt2(trained_model=x, model_type='semantic'),
+        'syntactic': lambda x: load_gpt2(trained_model=x, model_type='syntactic'),
         },
     'glove': {
         'integral': load_glove_int,
