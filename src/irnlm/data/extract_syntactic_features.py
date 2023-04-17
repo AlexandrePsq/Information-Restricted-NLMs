@@ -61,7 +61,7 @@ def integral2syntactic(path, nlp, transform_ids, language='english'):
         tmp = []
         for i, value in enumerate(activ):
             if value in transform_ids.keys():
-                tmp.append(transform_ids[value]+5) # to leave first indexes to special tokens
+                tmp.append(transform_ids[value]+5) # to leave first indexes to special tokens: ["<pad>", "<s>", "</s>", "<unk>", "<mask>"]
             else:
                 print(value, '-', sentences[index][i])
         iterator.append(tmp)

@@ -6,12 +6,12 @@ from irnlm.models.glove_semantic.glove import extract_features as glove_sem_extr
 from irnlm.models.glove_semantic.glove import load_model_and_tokenizer as load_glove_sem
 from irnlm.models.glove_syntactic.glove import extract_features as glove_syn_extractor
 from irnlm.models.glove_syntactic.glove import load_model_and_tokenizer as load_glove_syn
-from irnlm.models.gpt2.extract_features_gpt2 import extract_features as gpt2_int_extractor
-from irnlm.models.gpt2.extract_features_gpt2 import load_model_and_tokenizer as load_gpt2_int
-from irnlm.models.gpt2_semantic.extract_features_gpt2_semantic import extract_features as gpt2_sem_extractor
-from irnlm.models.gpt2_semantic.extract_features_gpt2_semantic import load_model_and_tokenizer as load_gpt2_sem
-from irnlm.models.gpt2_syntactic.extract_features_gpt2_syntactic import extract_features as gpt2_syn_extractor
-from irnlm.models.gpt2_syntactic.extract_features_gpt2_syntactic import load_model_and_tokenizer as load_gpt2_syn
+from irnlm.models.gpt2.extract_features_gpt2_integral import extract_features as gpt2_int_extractor
+from irnlm.models.gpt2.extract_features_gpt2_integral import load_model_and_tokenizer as load_gpt2_int
+from irnlm.models.gpt2.extract_features_gpt2_semantic import extract_features as gpt2_sem_extractor
+from irnlm.models.gpt2.extract_features_gpt2_semantic import load_model_and_tokenizer as load_gpt2_sem
+from irnlm.models.gpt2.extract_features_gpt2_syntactic import extract_features as gpt2_syn_extractor
+from irnlm.models.gpt2.extract_features_gpt2_syntactic import load_model_and_tokenizer as load_gpt2_syn
 from irnlm.utils import filter_args
 
 extractor_dict = {

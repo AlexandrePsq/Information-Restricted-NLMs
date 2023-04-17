@@ -186,7 +186,7 @@ However, if you want to use the same code that was used in the paper, you should
 The code might be more abstract (as it implements several classes) and slower (as it performs a nested-cross validation).
 
 ```shell
-# You shoudl first fill the template `--yaml_file` depending on the features you want to use 
+# You should first fill the template `--yaml_file` depending on the features you want to use 
 # and your choice of hyperparameters .
 python src/irnlm/encoding_pipeline/main.py --yaml_file src/irnlm/encoding_pipeline/template.yml
 ```
@@ -204,13 +204,15 @@ python scripts/replicate_figX.py
 
 To cite this work, use:
 
-```python
-@article{PasquiouIRNLM2023,
-  author = {... to do},
-  doi = {},
-  month = {02},
-  title = {{"Information-Restricted Neural Language Models Reveal Different Brain Regions' Sensitivity to Semantics, Syntax and Context"}},
-  url = {https://github.com/AlexandrePsq/Information-Restrited-NLMs},
-  year = {2023}
+```shell
+@misc{pasquiou2023,
+  doi = {10.48550/ARXIV.2302.14389},
+  url = {https://arxiv.org/abs/2302.14389},
+  author = {Pasquiou, Alexandre and Lakretz, Yair and Thirion, Bertrand and Pallier, Christophe},
+  keywords = {Computation and Language (cs.CL), FOS: Computer and information sciences, FOS: Computer and information sciences},
+  title = {Information-Restricted Neural Language Models Reveal Different Brain Regions' Sensitivity to Semantics, Syntax and Context},
+  publisher = {arXiv},
+  year = {2023},
+  copyright = {Creative Commons Attribution 4.0 International}
 }
 ```
