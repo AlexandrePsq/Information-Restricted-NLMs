@@ -37,7 +37,7 @@ class LMProcessor(DataProcessor):
     """Processor for language modeling."""
     
     def __init__(self, train_paths, dev_paths, test_paths, max_seq_length, device='cpu', output_dir='./', dataset_dir='./', n_splits=5, context_size=None):
-        self.max_seq_length = max_seq_length if context_size is None else context_size+5 # +5 because of the special tokens + the current and following tokens
+        self.max_seq_length = max_seq_length
         print(f'Using context_size of: {context_size} and max_seq_length of {self.max_seq_length}')
         self.device = device
         self.output_dir = output_dir
