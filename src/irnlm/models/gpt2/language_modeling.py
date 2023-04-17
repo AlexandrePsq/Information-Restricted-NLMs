@@ -23,16 +23,9 @@ from irnlm.utils import check_folder
 class LMDataset(Dataset):
     """Class for language modeling dataset fetching and formatting."""
 
-    def __init__(self, task_name, dataset_name, dataset_dir=None, url=None, language='english', extra=''):
-        super(LMDataset, self).__init__(task_name, dataset_name, dataset_dir, url, extra=extra)
+    def __init__(self, task_name, dataset_dir=None, url=None, language='english'):
+        super(LMDataset, self).__init__(task_name, dataset_dir, url)
         self.language = language
-
-    def _fetch_dataset(self):
-        """Fetch sentence classification dataset."""
-        if not os.path.exists(self.dataset_dir):
-            check_folder(self.dataset_dir)
-            if self.dataset_name=='lpp':
-                pass
     
     def get_labels(self):
         """ Returns possible labels for the task.
@@ -43,16 +36,14 @@ class LMDataset(Dataset):
 class LMProcessor(DataProcessor):
     """Processor for language modeling."""
     
-    def __init__(self, train_paths, dev_paths, test_paths, max_seq_length, device='cpu', output_dir='./', dataset_name='', dataset_dir='./', n_splits=5, context_size=None, extra=''):
+    def __init__(self, train_paths, dev_paths, test_paths, max_seq_length, device='cpu', output_dir='./', dataset_dir='./', n_splits=5, context_size=None):
         self.max_seq_length = max_seq_length if context_size is None else context_size+5 # +5 because of the special tokens + the current and following tokens
         print(f'Using context_size of: {context_size} and max_seq_length of {self.max_seq_length}')
         self.device = device
-        self.dataset_name = dataset_name
         self.output_dir = output_dir
         self.dataset_dir = dataset_dir
         self.n_splits = n_splits
         self.context_size=context_size
-        self.extra = extra
         self.train_paths = train_paths
         self.dev_paths = dev_paths
         self.test_paths = test_paths

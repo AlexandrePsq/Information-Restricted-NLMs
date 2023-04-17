@@ -58,7 +58,7 @@ def pad_to_max_length(sequence, max_seq_length, space=220, special_token_end=502
         else:
             return result + [space]
     else:
-        result = sequence + [special_token_pad] * ((max_seq_length - n)// 2)
+        result = sequence + [special_token_pad] * (max_seq_length - n)
         if len(result)==max_seq_length:
             return result
         else:

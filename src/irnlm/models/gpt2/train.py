@@ -74,10 +74,8 @@ if __name__=='__main__':
             max_seq_length=parameters['max_length'], 
             device=device, 
             output_dir=parameters['output_dir'], 
-            dataset_name=parameters['dataset_name'], 
             dataset_dir=parameters['dataset_dir'], 
             context_size=parameters['context_size'], 
-            extra=parameters['extra'], 
             n_splits=nb_splits
         )
     logging.info("\tDone.")

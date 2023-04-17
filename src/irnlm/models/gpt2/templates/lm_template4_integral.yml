@@ -20,8 +20,6 @@ do_validation: True
 metric_name: classification
 
 # Datasets
-dataset_name: 'CC100_integral_' # 'gpt2_'
-extra: '' # 'default-tokenizer_'
 dataset_dir: "/neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/french/training_data" #english/all_training" # Path/URL to the folder containing the dataset to use for fine-tuning
 use_output_mask: False # for token classification
 nb_splits: 10 #5 for french
@@ -80,7 +78,7 @@ lowercase: True
 vocab_size: 50000
 min_frequency: 2
 limit_alphabet: 1000
-context_size: 507
+context_size: 508
 device_map:
 
 # Optimizer
