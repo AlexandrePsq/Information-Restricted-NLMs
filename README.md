@@ -15,18 +15,33 @@ python -m spacy download en_core_web_lg-3.0.0 --direct # this is the version tha
 
 # Loading data
 
-## Training data: the Integral Dataset
+## French Training data: the Integral Dataset
 
-The Integral Dataset (train, test and dev) is directly available at https://osf.io/jzcvu/
+The Integral Dataset is derived from the CC100-French Dataset.
+It was downloaded from [CC100-French Dataset](http://data.statmt.org/cc-100/fr.txt.xz).
+
+As we used 5Gb of data for the English Integral Dataset, we did the same for the French Integral Dataset.
+To do so, we kept as training the 10 first chunks of 500M of data.
+The two following chunks of 500M of data were respectively used for validation (dev) and testing (test).
+
+```shell
+split --verbose -b500M data
+```
+
+The tokenizer was trained on the train set.
+
+## English Training data: the Integral Dataset
+
+The Integral Dataset (train, test and dev) is directly available at [English Integral Dataset](https://osf.io/jzcvu/).
 The following steps can regenerate it (computationally expensive...)
 
 ### Cleaning data
 
 ```shell
-# To apply it to a single text file
+# To apply to a single text file
 python scripts/clean_gutenberg_books.py --path /path/to/your/text_file.txt 
 
-# To apply it on all Gutenberg books (you should load all the required books before)
+# To apply on all Gutenberg books (you should load all the required books before)
 python scripts/clean_gutenberg_books.py
 ```
 
@@ -34,7 +49,7 @@ python scripts/clean_gutenberg_books.py
 
 TODO
 
-## Splitting data
+### Splitting data
 
 ```shell
 # To apply it to a single text file
@@ -43,7 +58,7 @@ python scripts/scripts/split_dataset.py --path data/train.txt --nsplits 5
 
 ## fMRI data: The Little Prince
 
-Load it from https://openneuro.org/datasets/ds003643/versions/2.0.1
+Load it from [TLP data](https://openneuro.org/datasets/ds003643/versions/2.0.1)
 Should be saved in `data` as:
 
 ```shell
@@ -64,6 +79,8 @@ fMRI
  |    |- ...
  |    |   |- ...
 ```
+
+If you change the names or the structure, you should change the functions that retrieve the data in `src/irnlm/data`.
 
 # Creating Semantic and Syntactic datasets
 
@@ -105,22 +122,10 @@ cd src/irnlm/models/glove_syntactic/
 
 # Train GPT-2
 
-TODO
+To train a GPT-2 model you should fill in a template in `src/irnlm/models/gpt2/templates/`, and call `src/irnlm/models/gpt2/train.py`.
+
 ```shell
-# GPT-2 Integral
-python src/irnlm/models/gpt2/train.py --yaml_file src/irnlm/models/gpt2/templates/lm_template4_full.yml
-
-# GPT-2 Integral - Context 5-15-45
-python src/irnlm/models/gpt2/train.py --yaml_file src/irnlm/models/gpt2/templates/lm_template4_context-5.yml
-python src/irnlm/models/gpt2/train.py --yaml_file src/irnlm/models/gpt2/templates/lm_template4_context-15.yml
-python src/irnlm/models/gpt2/train.py --yaml_file src/irnlm/models/gpt2/templates/lm_template4_context-45.yml
-
-# GPT-2 Semantic
-python src/irnlm/models/gpt2/train.py --yaml_file src/irnlm/models/gpt2_semantic/templates/lm_template4_full.yml
-
-# GPT-2 Syntactic
-python src/irnlm/models/gpt2/train.py --yaml_file src/irnlm/models/gpt2_syntactic/templates/lm_template4_syntax-context-full.yml
-
+python src/irnlm/models/gpt2/train.py --yaml_file src/irnlm/models/gpt2/templates/lm_template4_integral.yml
 ```
 
 
