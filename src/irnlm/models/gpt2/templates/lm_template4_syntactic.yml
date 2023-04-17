@@ -78,7 +78,7 @@ lowercase: True
 vocab_size: 1195
 min_frequency: 2
 limit_alphabet: 1000
-context_size: 507
+context_size: 508
 device_map:
 
 # Optimizer
