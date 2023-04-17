@@ -4,27 +4,14 @@
 #
 #
 import os
-import pathlib
-import logging
-import torch
 import pickle
-import pandas as pd
-from torch.utils.data import DataLoader, Dataset
-import torch
-from tqdm import tqdm
-from functools import partial
 from tokenizers.models import BPE
 from tokenizers.trainers import BpeTrainer
-from tokenizers.processors import TemplateProcessing
 from tokenizers.pre_tokenizers import Digits, Whitespace
 from tokenizers import Tokenizer, normalizers, pre_tokenizers
 from tokenizers.normalizers import NFD, Lowercase, StripAccents
 
 from transformers import PreTrainedTokenizerFast
-
-
-logging.basicConfig(level=logging.INFO)
-
 
         
 def read_bpe(
@@ -43,7 +30,6 @@ def read_bpe(
         - tokenizer object
     """
     if os.path.exists(f"{path}/bpe-vocab.json"):
-        logging.info(f"Loading tokenizer from {path}/bpe-vocab.json")
         #tokenizer = PreTrainedTokenizerFast(
         #    tokenizer_file=f"{path}/bpe-vocab.json",
         #    bos_token="[CLS]",
@@ -118,8 +104,8 @@ def train_bpe_tokenizer(
     tokenizer.__len__ = property(lambda self: self.vocab_size)
     tokenizer.enable_truncation(max_length=max_length)
 
-    print(tokenizer.encode("le rouge.").ids)
-    print(tokenizer.encode("le rouge."))
+    #print(tokenizer.encode("le rouge.").ids)
+    #print(tokenizer.encode("le rouge."))
     # Save the tokenizer
     tokenizer.save(f"{saving_folder}/bpe-vocab.json")
     return tokenizer

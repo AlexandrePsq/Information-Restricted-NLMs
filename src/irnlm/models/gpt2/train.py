@@ -52,7 +52,8 @@ if __name__=='__main__':
     check_folder(parameters['output_dir'])
     nb_splits = parameters['nb_splits']
     save_yaml(parameters, os.path.join(parameters['output_dir'], 'config.yml'))
-    logging.basicConfig(filename=os.path.join(parameters['output_dir'], parameters['log_file']), filemode='w+', level=logging.INFO)
+    log_path = os.path.join(parameters['output_dir'], parameters['log_file'])
+    logging.basicConfig(filename=log_path, filemode='w+', level=logging.INFO)
     logging.info("Parameters fetched.")
 
     logging.info("Setting seed for reproductibility...") 
@@ -113,7 +114,7 @@ if __name__=='__main__':
                     max_length=parameters['max_length'], #max_length  
                     training_data_paths=parameters['tokenizer_training_data_paths'],  
                     vocab_size=parameters['vocab_size'], 
-                    special_tokens=parameters['tokenizer_special_tokens'],  
+                    special_tokens=parameters['tokenizer_special_tokens'],
                 )
         
     processor.set_tokenizer(tokenizer)
