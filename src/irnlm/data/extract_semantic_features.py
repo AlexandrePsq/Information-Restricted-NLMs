@@ -1,8 +1,33 @@
-from irnlm.data.utils import get_function_words
+from irnlm.data.utils import (
+    get_negations,
+    get_pronouns,
+    get_positions_words,
+    get_quantity_words,
+    get_function_words
+)
 from irnlm.data.text_tokenizer import tokenize
 
 
-function_words = get_function_words()
+def get_mapping(language):
+    """
+    """
+    mapping = {word: 'PRON' for word in get_pronouns(language)}
+    mapping.update({word: 'POSITION' for word in get_positions_words(language)})
+    mapping.update({word: 'NEG' for word in get_negations(language)})
+    mapping.update({word: 'QUANTITY' for word in get_quantity_words(language)})
+    return mapping
+
+def clean_sentence(sent, mapping, function_words):
+    """Replace pronouns with PRON.
+    Replace positions with POSITION.
+    Replace negations with NEG.
+    Replace quantity with QUANTITY.
+    Remove function words.
+    """
+    words = sent.split(' ')
+    words  = [mapping[word.lower()] for word in words]
+    sent = ' '.join([word for word in words if word.lower() not in function_words])
+    return sent
 
 def integral2semantic(path, language='english'):
     """Extract semantic features from the integral text.
@@ -11,8 +36,11 @@ def integral2semantic(path, language='english'):
     Returns:
         - iterator: list of str (content words)
     """
+    mapping = get_mapping(language)
+    function_words = get_function_words(language=language)
     iterator = tokenize(path, language=language, with_punctuation=True, convert_numbers=True)
     iterator = [item.strip() for item in iterator]
-    iterator = [' '.join([word for word in sent.split(' ') if word.lower() not in function_words]) for sent in iterator]
+    iterator = [clean_sentence(sent, mapping, function_words) for sent in iterator]
     iterator = [item for item in iterator if item !='']
     return iterator
+

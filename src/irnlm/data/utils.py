@@ -45,11 +45,59 @@ def load_path_from_ids(id_):
     #return text
     raise NotImplementedError('You need to create your own fetcher!')
 
-def get_function_words():
-    """Return the list of Gutenberg bookds that
-    were downloaded before behing filtered and cleaned.
+def get_pronouns(language='english'):
+    """Returns the list of pronouns for the chosen language.
     """
-    result = open('data/english_function_words.txt', 'r').read().split('\n')
+    if language=='english':
+        result = open('data/english_pronouns.txt', 'r').read().split('\n')
+    elif language=='french':
+        result = open('data/french_pronouns.txt', 'r').read().split('\n')
+    else:
+        raise ValueError(f'Language {language} unknown.')
+    return result
+
+def get_negations(language='english'):
+    """Returns the list of negations for the chosen language.
+    """
+    if language=='english':
+        result = open('data/english_negations.txt', 'r').read().split('\n')
+    elif language=='french':
+        result = open('data/french_negations.txt', 'r').read().split('\n')
+    else:
+        raise ValueError(f'Language {language} unknown.')
+    return result
+
+def get_positions_words(language='english'):
+    """Returns the list of positions for the chosen language.
+    """
+    if language=='english':
+        result = open('data/english_positions.txt', 'r').read().split('\n')
+    elif language=='french':
+        result = open('data/french_positions.txt', 'r').read().split('\n')
+    else:
+        raise ValueError(f'Language {language} unknown.')
+    return result
+
+def get_quantity_words(language='english'):
+    """Returns the list of quantity for the chosen language.
+    """
+    if language=='english':
+        result = open('data/english_quantity.txt', 'r').read().split('\n')
+    elif language=='french':
+        result = open('data/french_quantity.txt', 'r').read().split('\n')
+    else:
+        raise ValueError(f'Language {language} unknown.')
+    return result
+
+def get_function_words(language='english'):
+    """Returns the list of funtion words for the chosen language.
+    """
+    if language=='english':
+        result = open('data/english_function_words.txt', 'r').read().split('\n')
+    elif language=='french':
+        result = open('data/french_function_words.txt', 'r').read().split('\n')
+    else:
+        raise ValueError(f'Language {language} unknown.')
     return result
 
 def get_ids_syntax():
