@@ -14,9 +14,9 @@ seed: 1111 # Seed for reproductibility
 output_dir: /neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/derivatives/fMRI/models/french/irnlm/GPT-2/GPT-2_L-4_H-768_integral
 log_file: logs_validation.txt
 local_rank: -1
-do_test: False
+do_test: True
 do_train: True
-do_validation: False
+do_validation: True
 metric_name: classification
 
 # Datasets
@@ -55,20 +55,20 @@ tokenizer_special_tokens:
   - "<mask>" # "[MASK]"
 tokenizer_path: "/neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/french/training_data/integral"
 train_paths: 
-  - CC100_integral_train_split-0.pkl
-  - CC100_integral_train_split-1.pkl
-  - CC100_integral_train_split-2.pkl
-  - CC100_integral_train_split-3.pkl
-  - CC100_integral_train_split-4.pkl
-  - CC100_integral_train_split-5.pkl
-  - CC100_integral_train_split-6.pkl
-  - CC100_integral_train_split-7.pkl
-  - CC100_integral_train_split-8.pkl
-  - CC100_integral_train_split-9.pkl
+  - /neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/french/training_data/CC100_integral_train_split-0.pkl
+  - /neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/french/training_data/CC100_integral_train_split-1.pkl
+  - /neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/french/training_data/CC100_integral_train_split-2.pkl
+  - /neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/french/training_data/CC100_integral_train_split-3.pkl
+  - /neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/french/training_data/CC100_integral_train_split-4.pkl
+  - /neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/french/training_data/CC100_integral_train_split-5.pkl
+  - /neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/french/training_data/CC100_integral_train_split-6.pkl
+  - /neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/french/training_data/CC100_integral_train_split-7.pkl
+  - /neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/french/training_data/CC100_integral_train_split-8.pkl
+  - /neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/french/training_data/CC100_integral_train_split-9.pkl
 dev_paths: 
-  - CC100_integral_dev_split-0.pkl
+  - /neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/french/training_data/CC100_integral_dev_split-0.pkl
 test_paths: 
-  - CC100_integral_test_split-0.pkl
+  - /neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/french/training_data/CC100_integral_test_split-0.pkl
 output_attentions: True
 output_hidden_states: True
 max_length: 512
