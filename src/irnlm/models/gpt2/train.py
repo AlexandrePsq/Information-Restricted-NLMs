@@ -11,7 +11,6 @@ import logging
 import argparse
 import pandas as pd
 
-from tokenizers import ByteLevelBPETokenizer
 from transformers import (
     AdamW, GPT2Config, 
     get_linear_schedule_with_warmup, 
@@ -21,7 +20,7 @@ from transformers import (
 
 from irnlm.models.gpt2.modeling_hacked_gpt2_integral import GPT2LMHeadModel
 from irnlm.models.gpt2.modeling_hacked_gpt2_semantic import GPT2LMHeadModel as GPT2LMHeadModelSemantic
-from irnlm.models.gpt2.language_modeling import LMDataset, LMProcessor
+from irnlm.models.gpt2.language_modeling import LMProcessor
 from irnlm.utils import (
     read_yaml, 
     check_folder, 
@@ -67,8 +66,19 @@ if __name__=='__main__':
 
     logging.info("Instanciating dataset and data processor...")
     if task in ['language-modeling']:
-        data = LMDataset(task, parameters['dataset_name'].lower(), dataset_dir=parameters['dataset_dir'])
-        processor = LMProcessor(parameters['max_length'], device=device, output_dir=parameters['output_dir'], dataset_name=parameters['dataset_name'], dataset_dir=parameters['dataset_dir'], context_size=parameters['context_size'], extra=parameters['extra'], n_splits=nb_splits)
+        processor = LMProcessor(
+            train_paths=parameters['train_paths'],
+            dev_paths=parameters['dev_paths'],
+            test_paths=parameters['test_paths'],
+            max_seq_length=parameters['max_length'], 
+            device=device, 
+            output_dir=parameters['output_dir'], 
+            dataset_name=parameters['dataset_name'], 
+            dataset_dir=parameters['dataset_dir'], 
+            context_size=parameters['context_size'], 
+            extra=parameters['extra'], 
+            n_splits=nb_splits
+        )
     logging.info("\tDone.")
 
     logging.info(f"Fetching GPT-2 model for the task: {parameters['task']}...")
@@ -158,7 +168,14 @@ if __name__=='__main__':
     
     try:
         if parameters['do_train'] or parameters['do_validation']:
-            training_stats = model_processor.train(processor, train_data_paths, dev_data_paths, parameters['output_dir'], parameters=parameters, start_at_dataloader=start_at_dataloader)
+            training_stats = model_processor.train(
+                processor, 
+                train_data_paths, 
+                dev_data_paths, 
+                parameters['output_dir'], 
+                parameters=parameters, 
+                start_at_dataloader=start_at_dataloader
+            )
             
             logging.info("Saving fine-tuned model to {}...".format(os.path.join(parameters['output_dir'], 'fine_tuned')))
             name = f"started_at_{parameters['init_checkpoints']}_fine_tuned" if parameters['init_checkpoints'] > 0 else 'fine_tuned'

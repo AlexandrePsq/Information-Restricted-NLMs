@@ -54,6 +54,21 @@ tokenizer_special_tokens:
   - "<unk>" # "[UNK]"
   - "<mask>" # "[MASK]"
 tokenizer_path: "/neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/french/training_data/integral"
+train_paths: 
+  - CC100_integral_train_split-0.pkl
+  - CC100_integral_train_split-1.pkl
+  - CC100_integral_train_split-2.pkl
+  - CC100_integral_train_split-3.pkl
+  - CC100_integral_train_split-4.pkl
+  - CC100_integral_train_split-5.pkl
+  - CC100_integral_train_split-6.pkl
+  - CC100_integral_train_split-7.pkl
+  - CC100_integral_train_split-8.pkl
+  - CC100_integral_train_split-9.pkl
+dev_paths: 
+  - CC100_integral_dev_split-0.pkl
+test_paths: 
+  - CC100_integral_test_split-0.pkl
 output_attentions: True
 output_hidden_states: True
 max_length: 512

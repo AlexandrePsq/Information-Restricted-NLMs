@@ -43,7 +43,7 @@ class LMDataset(Dataset):
 class LMProcessor(DataProcessor):
     """Processor for language modeling."""
     
-    def __init__(self, max_seq_length, device='cpu', output_dir='./', dataset_name='', dataset_dir='./', n_splits=5, context_size=None, extra=''):
+    def __init__(self, train_paths, dev_paths, test_paths, max_seq_length, device='cpu', output_dir='./', dataset_name='', dataset_dir='./', n_splits=5, context_size=None, extra=''):
         self.max_seq_length = max_seq_length if context_size is None else context_size+5 # +5 because of the special tokens + the current and following tokens
         print(f'Using context_size of: {context_size} and max_seq_length of {self.max_seq_length}')
         self.device = device
@@ -53,14 +53,26 @@ class LMProcessor(DataProcessor):
         self.n_splits = n_splits
         self.context_size=context_size
         self.extra = extra
+        self.train_paths = train_paths
+        self.dev_paths = dev_paths
+        self.test_paths = test_paths
+        
 
     def get_data(self, set_type):
         """See base class."""
-        paths = [os.path.join(self.dataset_dir, f'{self.dataset_name}{self.extra}{set_type}_all-ids_split-{index_split}.pkl') for index_split in range(self.n_splits)]
+        #paths = [os.path.join(self.dataset_dir, f'{self.dataset_name}{self.extra}{set_type}_all-ids_split-{index_split}.pkl') for index_split in range(self.n_splits)]
+        if set_type=='train':
+            paths = self.train_paths
+        elif set_type=='dev':
+            paths = self.train_paths
+        elif set_type=='test':
+            paths = self.train_paths
+        else:
+            raise ValueError(f'set_type {set_type} unknown.')
         if all([os.path.exists(p) for p in paths]):
             return paths
         else:
-            raise NotImplementedError("Dataset not defined: ", paths)
+            raise NotImplementedError("Paths not defined: ", paths)
     
     def set_tokenizer(self, tokenizer):
         """Set processor tokenizer."""
