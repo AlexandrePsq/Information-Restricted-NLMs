@@ -148,7 +148,7 @@ class ModelProcessor(object):
 
         # Measure the total training time for the whole run.
         total_t0 = time.time()
-        checkpoints_index = parameters['init_checkpoints']
+        #checkpoints_index = parameters['init_checkpoints']
         
         #for epoch_i in range(parameters['start_epoch'], self.nb_epochs):
         for epoch_i in range(0, self.nb_epochs):
@@ -222,10 +222,10 @@ class ModelProcessor(object):
                             for step, batch in enumerate(dataloader):
                                 step += nb_batchs_done
 
-                                # Save model weights to have a given number of checkpoints at the end
-                                if step != 0 and step % save_step == 0:
-                                    save_checkpoint(self.model, self.tokenizer, output_dir, 'checkpoint_' + str(checkpoints_index))
-                                    checkpoints_index += 1
+                                ## Save model weights to have a given number of checkpoints at the end
+                                #if step != 0 and step % save_step == 0:
+                                #    save_checkpoint(self.model, self.tokenizer, output_dir, 'checkpoint_' + str(checkpoints_index))
+                                #    checkpoints_index += 1
                                 # Progress update every 50 batches.
                                 if step % min(50, save_step) == 0 and not step == 0:
                                     # Calculate elapsed time in minutes.
