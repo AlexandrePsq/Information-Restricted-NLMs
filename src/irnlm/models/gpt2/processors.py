@@ -367,6 +367,7 @@ class ModelProcessor(object):
             else:
                 examples_ids = [create_examples(
                                     data[i*self.context_size:min((i+1)*self.context_size + 2, n)],
+                                    parameters['max_length'],
                                     space=space, 
                                     special_token_beg=special_token_beg_ids, 
                                     special_token_end=special_token_end_ids, 
