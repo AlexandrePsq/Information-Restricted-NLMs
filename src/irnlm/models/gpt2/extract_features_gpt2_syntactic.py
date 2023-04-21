@@ -63,6 +63,7 @@ def extract_features(
     bsz=32,
     FEATURE_COUNT=768,
     NUM_HIDDEN_LAYERS=12,
+    language='english'
     ):
     """Extract the features from GPT-2.
     Args:
@@ -82,7 +83,7 @@ def extract_features(
 
     transform_ids = get_ids_syntax()
 
-    iterator = integral2syntactic(path, nlp, transform_ids, language='english')
+    iterator = integral2syntactic(path, nlp, transform_ids, language=language)
     mapping = {i:[i] for i, j in enumerate(iterator)}
     print(f"Using context length of {context_size}.")
     

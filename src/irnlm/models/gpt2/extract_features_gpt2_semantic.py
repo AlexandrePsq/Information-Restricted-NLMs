@@ -7,6 +7,7 @@ import torch
 
 from irnlm.data.text_tokenizer import tokenize
 from irnlm.data.utils import get_function_words
+from irnlm.data.extract_semantic_features import integral2semantic
 from irnlm.models.gpt2.extract_features_gpt2_integral import create_examples
 
 
@@ -89,11 +90,7 @@ def extract_features(
         - nlp_tokenizer: HuggingFace tokenizer
     """
     features = []
-    function_words = get_function_words()
-    iterator = tokenize(path, language=language, with_punctuation=True, convert_numbers=True)
-    iterator = [item.strip() for item in iterator]
-    iterator = [' '.join([word for word in sent.split(' ') if word.lower() not in function_words]) for sent in iterator]
-    iterator = [item for item in iterator if item !='']
+    iterator = integral2semantic(path, language=language)
 
     ids = nlp_tokenizer(iterator).word_ids() 
     unique_ids = np.unique(ids) 

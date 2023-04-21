@@ -3,7 +3,8 @@ from irnlm.data.utils import (
     get_pronouns,
     get_positions_words,
     get_quantity_words,
-    get_function_words
+    get_function_words,
+    get_punctuation
 )
 from irnlm.data.text_tokenizer import tokenize
 
@@ -25,7 +26,7 @@ def clean_sentence(sent, mapping, function_words):
     Remove function words.
     """
     words = sent.split(' ')
-    words  = [mapping[word.lower()] for word in words]
+    words  = [mapping[word.lower()] if word.lower() in mapping.keys() else word for word in words]
     sent = ' '.join([word for word in words if word.lower() not in function_words])
     return sent
 
@@ -37,7 +38,7 @@ def integral2semantic(path, language='english'):
         - iterator: list of str (content words)
     """
     mapping = get_mapping(language)
-    function_words = get_function_words(language=language)
+    function_words = get_function_words(language=language) + get_punctuation()
     iterator = tokenize(path, language=language, with_punctuation=True, convert_numbers=True)
     iterator = [item.strip() for item in iterator]
     iterator = [clean_sentence(sent, mapping, function_words) for sent in iterator]
