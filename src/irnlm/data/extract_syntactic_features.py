@@ -1,5 +1,6 @@
 from tqdm import tqdm
 
+from irnlm.utils import save_pickle, write
 from irnlm.data.text_tokenizer import tokenize
 from irnlm.data.utils import get_possible_morphs, get_possible_pos
 
@@ -54,10 +55,13 @@ def integral2syntactic(path, nlp, transform_ids, language='english'):
     #iterator = [' '.join([word.lower() for word in sent.split(' ')]) for sent in iterator]
     docs = [nlp(sent) for sent in iterator if sent !='']
 
-    sentences = [doc.text.split(' ') for doc in docs]
-    activations = [extract_syntax(doc) for doc in docs]
+    n = len(docs)
+    sentences = [doc.text.split(' ') for doc in tqdm(docs, total=n)]
+    activations = [extract_syntax(doc) for doc in tqdm(docs, total=n)]
+
+    save_pickle('./tmp.pkl', activations)
     iterator = []
-    for index, activ in tqdm(enumerate(activations)):
+    for index, activ in tqdm(enumerate(activations), total=n):
         tmp = []
         for i, value in enumerate(activ):
             if value in transform_ids.keys():
