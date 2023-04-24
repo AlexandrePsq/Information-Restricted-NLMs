@@ -65,7 +65,7 @@ def preprocess(text, special_words, language, convert_numbers=False):
     if convert_numbers:
         transf = inflect.engine()
         numbers = re.findall('\d+', text)
-        for number in numbers:
+        for number in tqdm(numbers, desc='Converting numbers', total=len(numbers)):
             text = text.replace(number, transf.number_to_words(number))
     if language=='french':
         punctuation = [',', ';', ':', '/', '-', '"', '‘', '’', '(', ')', '{', '}', '[', ']', '`', '“', '”', '—', '«', '»', "'"]

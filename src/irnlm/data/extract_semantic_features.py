@@ -1,4 +1,5 @@
 from tqdm import tqdm
+from joblib import Parallel, delayed
 
 from irnlm.data.utils import (
     get_negations,
@@ -32,7 +33,7 @@ def clean_sentence(sent, mapping, function_words):
     sent = ' '.join([word for word in words if word.lower() not in function_words])
     return sent
 
-def integral2semantic(path, language='english'):
+def integral2semantic(path, language='english', n_jobs=-1):
     """Extract semantic features from the integral text.
     Args:
         - path: path
@@ -43,7 +44,11 @@ def integral2semantic(path, language='english'):
     function_words = get_function_words(language=language) + get_punctuation()
     iterator = tokenize(path, language=language, with_punctuation=True, convert_numbers=True)
     iterator = [item.strip() for item in iterator]
-    iterator = [clean_sentence(sent, mapping, function_words) for sent in tqdm(iterator)]
+    iterator = Parallel(n_jobs=n_jobs, batch_size=1000)(
+        delayed(clean_sentence)(sent, mapping, function_words) 
+        for sent in tqdm(iterator, desc='Cleaning sentences', total=len(iterator))
+        )
+    #iterator = [clean_sentence(sent, mapping, function_words) for sent in tqdm(iterator, desc='Cleaning sentences', total=len(iterator))]
     iterator = [item for item in iterator if item !='']
     return iterator
 
