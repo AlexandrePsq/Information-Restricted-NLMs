@@ -54,15 +54,15 @@ def integral2syntactic(path, nlp, transform_ids, language='english', convert_num
     iterator = tokenize(path, language=language, with_punctuation=True, convert_numbers=convert_numbers)
     iterator = [item.strip() for item in iterator]
     #iterator = [' '.join([word.lower() for word in sent.split(' ')]) for sent in iterator]
-    docs = [nlp(sent) for sent in iterator if sent !='']
+    docs = [nlp(sent) for sent in tqdm(iterator, desc='Applying pipeline.', total=len(iterator)) if sent !='']
 
     n = len(docs)
-    sentences = [doc.text.split(' ') for doc in tqdm(docs, total=n)]
-    activations = [extract_syntax(doc) for doc in tqdm(docs, total=n)]
+    sentences = [doc.text.split(' ') for doc in tqdm(docs, desc='Splitting to words.', total=n)]
+    activations = [extract_syntax(doc) for doc in tqdm(docs, desc='Extracting syntax.', total=n)]
 
     save_pickle('./tmp.pkl', activations)
     iterator = []
-    for index, activ in tqdm(enumerate(activations), total=n):
+    for index, activ in tqdm(enumerate(activations), total=n, desc='Normalizing values.'):
         tmp = []
         for i, value in enumerate(activ):
             if value in transform_ids.keys():
