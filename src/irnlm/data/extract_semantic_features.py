@@ -1,3 +1,5 @@
+from tqdm import tqdm
+
 from irnlm.data.utils import (
     get_negations,
     get_pronouns,
@@ -41,7 +43,7 @@ def integral2semantic(path, language='english'):
     function_words = get_function_words(language=language) + get_punctuation()
     iterator = tokenize(path, language=language, with_punctuation=True, convert_numbers=True)
     iterator = [item.strip() for item in iterator]
-    iterator = [clean_sentence(sent, mapping, function_words) for sent in iterator]
+    iterator = [clean_sentence(sent, mapping, function_words) for sent in tqdm(iterator)]
     iterator = [item for item in iterator if item !='']
     return iterator
 
