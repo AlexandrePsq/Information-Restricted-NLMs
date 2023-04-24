@@ -40,17 +40,18 @@ def extract_syntax(doc):
     #print(morphs, ncn)
     return [int(''.join(items)) for items in list(zip(ncn, morph, pos_))]
 
-def integral2syntactic(path, nlp, transform_ids, language='english'):
+def integral2syntactic(path, nlp, transform_ids, language='english', convert_numbers=False):
     """Extract syntactic features from the integral text.
     Args:
         - path: list of str (sentences)
         - nlp: Spacy NLP pipelne
         - transform_ids: dict (mapping ids)
         - language: str
+        - convert_numbers: bool
     Returns:
         - iterator: list of str (content words)
     """
-    iterator = tokenize(path, language=language, with_punctuation=True, convert_numbers=True)
+    iterator = tokenize(path, language=language, with_punctuation=True, convert_numbers=convert_numbers)
     iterator = [item.strip() for item in iterator]
     #iterator = [' '.join([word.lower() for word in sent.split(' ')]) for sent in iterator]
     docs = [nlp(sent) for sent in iterator if sent !='']

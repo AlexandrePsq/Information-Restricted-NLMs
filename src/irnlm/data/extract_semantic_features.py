@@ -33,16 +33,18 @@ def clean_sentence(sent, mapping, function_words):
     sent = ' '.join([word for word in words if word.lower() not in function_words])
     return sent
 
-def integral2semantic(path, language='english', n_jobs=-1):
+def integral2semantic(path, language='english', n_jobs=-1, convert_numbers=False):
     """Extract semantic features from the integral text.
     Args:
         - path: path
+        - n_jobs: int
+        - convert_numbers: bool
     Returns:
         - iterator: list of str (content words)
     """
     mapping = get_mapping(language)
     function_words = get_function_words(language=language) + get_punctuation()
-    iterator = tokenize(path, language=language, with_punctuation=True, convert_numbers=True)
+    iterator = tokenize(path, language=language, with_punctuation=True, convert_numbers=convert_numbers)
     iterator = [item.strip() for item in iterator]
     iterator = Parallel(n_jobs=n_jobs, batch_size=1000)(
         delayed(clean_sentence)(sent, mapping, function_words) 
