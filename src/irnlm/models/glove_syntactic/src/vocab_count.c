@@ -36,7 +36,7 @@ typedef struct vocabulary {
 
 int verbose = 2; // 0, 1, or 2
 long long min_count = 1; // min occurrences for inclusion in vocab
-long long max_vocab = 50001; // max_vocab = 0 for no limit
+long long max_vocab = 1195; // max_vocab = 0 for no limit
 
 
 /* Vocab frequency comparison; break ties alphabetically */

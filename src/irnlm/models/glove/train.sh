@@ -15,7 +15,7 @@ make
 #  rm text8.zip
 #fi
 
-CORPUS=../../../../data/train.txt # path to training data
+CORPUS=../../../../../data/text/french/training_data/glove_train_integral.txt # path to training data
 VOCAB_FILE=vocab_Integral.txt # path to vocabulary (it can be an empty path if you want to compute the vocabulary on the training data)
 # You can set vocabulary size (default=50001) in src/vocab_count.c
 COOCCURRENCE_FILE=cooccurrence.bin
