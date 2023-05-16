@@ -1,3 +1,4 @@
+import os
 from tqdm import tqdm
 
 from irnlm.utils import save_pickle, write
@@ -9,38 +10,50 @@ morphs = get_possible_morphs()
 pos = get_possible_pos()
 
 
-def extract_syntax(doc): 
-    """Extract number of closing nodes for each words of an input sequence. 
-    """ 
-    ncn = [] 
+def extract_syntax(doc):
+    """Extract number of closing nodes for each words of an input sequence."""
+    ncn = []
     morph = []
     pos_ = []
-    for sent in doc.sents: 
-        parsed_string = sent._.parse_string 
-        words = sent.text.split(' ') 
-        for token in sent: 
-            m = str(morphs.index(str(token.morph))) if str(token.morph)!='' else '0'
-            if len(m)==1:
-                m = '0' + m
+    for sent in doc.sents:
+        parsed_string = sent._.parse_string
+        words = sent.text.split(" ")
+        for token in sent:
+            m = str(morphs.index(str(token.morph))) if str(token.morph) != "" else "0"
+            if len(m) == 1:
+                m = "0" + m
             morph.append(m)
             p = str(pos.index(token.pos_))
-            if len(p)==1:
-                p = '0' + p
+            if len(p) == 1:
+                p = "0" + p
             pos_.append(p)
-            word = token.text+')' 
+            word = token.text + ")"
             index = parsed_string.find(word)
-            l = len(word) 
-            count = 1 
-            i = index+l 
-            while i<len(parsed_string) and parsed_string[i]==')' :
-                count+=1
-                i+=1
-            ncn.append(str(min(count, 9))) # we take into account a maximum of 9 closing parenthesis
+            l = len(word)
+            count = 1
+            i = index + l
+            while i < len(parsed_string) and parsed_string[i] == ")":
+                count += 1
+                i += 1
+            ncn.append(
+                str(min(count, 9))
+            )  # we take into account a maximum of 9 closing parenthesis
             parsed_string = parsed_string[i:]
-    #print(morphs, ncn)
-    return [int(''.join(items)) for items in list(zip(ncn, morph, pos_))]
+    # print(morphs, ncn)
+    return [int("".join(items)) for items in list(zip(ncn, morph, pos_))]
 
-def integral2syntactic(path, nlp, transform_ids, language='english', convert_numbers=False):
+
+def integral2syntactic(
+    path,
+    nlp,
+    transform_ids,
+    language="english",
+    convert_numbers=False,
+    index=None,
+    nblocks=1000,
+    normalize=True,
+    saving_path="./syntactic_activations.pkl",
+):
     """Extract syntactic features from the integral text.
     Args:
         - path: list of str (sentences)
@@ -48,54 +61,55 @@ def integral2syntactic(path, nlp, transform_ids, language='english', convert_num
         - transform_ids: dict (mapping ids)
         - language: str
         - convert_numbers: bool
+        - convert_numbers: bool
+        - index: str
+        - nblocks: int
+        - normalize: bool, whether to use `transform_ids` to change the `ids` found.
+        - saving_path: str
     Returns:
         - iterator: list of str (content words)
     """
-    iterator = tokenize(path, language=language, with_punctuation=True, convert_numbers=convert_numbers)
+    iterator = tokenize(
+        path, language=language, with_punctuation=True, convert_numbers=convert_numbers
+    )
     iterator = [item.strip() for item in iterator]
-    #iterator = [' '.join([word.lower() for word in sent.split(' ')]) for sent in iterator]
-    docs = [nlp(sent) for sent in tqdm(iterator, desc='Applying pipeline.', total=len(iterator)) if sent !='']
+    n = len(iterator)
+    if index is not None:
+        iterator = iterator[index * n // nblocks : (index + 1) * n // nblocks]
+    else:
+        index = ""
+    # iterator = [' '.join([word.lower() for word in sent.split(' ')]) for sent in iterator]
+    docs = [
+        nlp(sent)
+        for sent in tqdm(iterator, desc="Applying pipeline.", total=len(iterator))
+        if sent != ""
+    ]
 
     n = len(docs)
-    sentences = [doc.text.split(' ') for doc in tqdm(docs, desc='Splitting to words.', total=n)]
-    activations = [extract_syntax(doc) for doc in tqdm(docs, desc='Extracting syntax.', total=n)]
+    sentences = [
+        doc.text.split(" ") for doc in tqdm(docs, desc="Splitting to words.", total=n)
+    ]
+    activations = [
+        extract_syntax(doc) for doc in tqdm(docs, desc="Extracting syntax.", total=n)
+    ]
 
-    save_pickle('./tmp.pkl', activations)
-    iterator = []
-    for index, activ in tqdm(enumerate(activations), total=n, desc='Normalizing values.'):
-        tmp = []
-        for i, value in enumerate(activ):
-            if value in transform_ids.keys():
-                tmp.append(transform_ids[value]+5) # to leave first indexes to special tokens: ["<pad>", "<s>", "</s>", "<unk>", "<mask>"]
-            else:
-                print(value, '-', sentences[index][i])
-        iterator.append(tmp)
-    iterator = [i for l in iterator for i in l]
+    save_pickle(
+        os.path.join(os.path.dirname(saving_path), "tmp{index}.pkl"), activations
+    )
+    if normalize:
+        iterator = []
+        for index, activ in tqdm(
+            enumerate(activations), total=n, desc="Normalizing values."
+        ):
+            tmp = []
+            for i, value in enumerate(activ):
+                if value in transform_ids.keys():
+                    tmp.append(
+                        transform_ids[value] + 5
+                    )  # to leave first indexes to special tokens: ["<pad>", "<s>", "</s>", "<unk>", "<mask>"]
+                else:
+                    print(value, "-", sentences[index][i])
+            iterator.append(tmp)
+        iterator = [i for l in iterator for i in l]
 
-    return iterator
-
-
-
-# FOR BIG DATASETS
-#def text_to_doc(nlp, text, n_split_internal=500, name='_train_', index=0, saving_name='./tmp_doc_syntax.pkl'):
-#    """Convert a text 
-#    """
-#    result = []
-#    n = len(text)
-#    print('Text length: ', n)
-#    for i in tqdm(range(n_split_internal)):
-#        data = text[i*n//n_split_internal: (i+1)*n//n_split_internal]
-#        try:
-#            data = ' . '.join(data.split('.')[:-1])+ ' .'
-#        except:
-#            print('failed to parse sentences...')
-#            data = '.'.join([str(k) for k in data.split('.')][:-1])+ ' .'
-#        print('Tokenizing...')
-#        data_tmp = tokenize(data, language='english', train=False, with_punctuation=True, convert_numbers=True)
-#        print('Parsing...')
-#        doc = nlp(' '.join(data_tmp))
-#        print('Retrieving syntax...')
-#        result.append(extract_syntax(doc))
-#    result = [i for l in result for i in l]
-#    save_pickle(saving_name, result)
-#    return result
+        return iterator
