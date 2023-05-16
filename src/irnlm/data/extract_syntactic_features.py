@@ -69,6 +69,12 @@ def integral2syntactic(
     Returns:
         - iterator: list of str (content words)
     """
+    check_folder(
+        os.path.join(
+            os.path.dirname(saving_path),
+            "CC100_syntactic_train_split-" + os.path.basename(path).split(".")[1],
+        )
+    )
     morphs = get_possible_morphs(nlp)
     pos = get_possible_pos()
 
@@ -111,13 +117,10 @@ def integral2syntactic(
     #    extract_syntax(doc) for doc in tqdm(docs, desc="Extracting syntax.", total=n)
     # ]
 
-    check_folder(
-        os.path.join(os.path.dirname(saving_path), os.path.basename(path).split(".")[0])
-    )
     save_pickle(
         os.path.join(
             os.path.dirname(saving_path),
-            os.path.basename(path).split(".")[0],
+            "CC100_syntactic_train_split-" + os.path.basename(path).split(".")[1],
             f"tmp{index}.pkl",
         ),
         activations,
