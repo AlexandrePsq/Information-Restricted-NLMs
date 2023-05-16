@@ -3,7 +3,7 @@ import gc
 from tqdm import tqdm
 from joblib import Parallel, delayed
 
-from irnlm.utils import save_pickle, write
+from irnlm.utils import save_pickle, write, check_folder
 from irnlm.data.text_tokenizer import tokenize
 from irnlm.data.utils import get_possible_morphs, get_possible_pos
 
@@ -111,8 +111,16 @@ def integral2syntactic(
     #    extract_syntax(doc) for doc in tqdm(docs, desc="Extracting syntax.", total=n)
     # ]
 
+    check_folder(
+        os.path.join(os.path.dirname(saving_path), os.path.basename(path).split(".")[0])
+    )
     save_pickle(
-        os.path.join(os.path.dirname(saving_path), f"tmp{index}.pkl"), activations
+        os.path.join(
+            os.path.dirname(saving_path),
+            os.path.basename(path).split(".")[0],
+            f"tmp{index}.pkl",
+        ),
+        activations,
     )
     if normalize:
         iterator = []
