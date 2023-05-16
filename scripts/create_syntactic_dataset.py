@@ -9,23 +9,21 @@ from irnlm.utils import save_pickle, write
 
 
 def load_nlp_pipeline(language):
-    """
-    """
+    """ """
     benepar_model = {
-        'english': "benepar_en3",
-        'french': "benepar_fr",
+        "english": "benepar_en3",
+        "french": "benepar_fr",
     }
     model = {
-        'english': "en_core_web_lg",
-        'french': "fr_core_news_lg",
+        "english": "en_core_web_lg",
+        "french": "fr_core_news_lg",
     }
     nlp = set_nlp_pipeline(name=model[language])
     special_case = [{ORTH: "hasnt"}]
     nlp.tokenizer.add_special_case("hasnt", special_case)
     benepar.download(benepar_model[language])
-    nlp.add_pipe("benepar", config={"model": benepar_model[language])})
+    nlp.add_pipe("benepar", config={"model": benepar_model[language]})
     print(nlp.pipe_names)
-    
 
 
 if __name__ == "__main__":
@@ -57,7 +55,7 @@ if __name__ == "__main__":
         index=args.index,
         nblocks=args.nblocks,
         normalize=args.normalize,
-        saving_path=args.saving_path
+        saving_path=args.saving_path,
     )
 
     if args.normalize:
