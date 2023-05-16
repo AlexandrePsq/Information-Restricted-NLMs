@@ -1,5 +1,6 @@
 import os
 from tqdm import tqdm
+from joblib import Parallel, delayed
 
 from irnlm.utils import save_pickle, write
 from irnlm.data.text_tokenizer import tokenize
@@ -17,10 +18,12 @@ def extract_syntax(doc):
     pos_ = []
     for sent in doc.sents:
         parsed_string = sent._.parse_string
-        words = sent.text.split(" ")
+        # words = sent.text.split(" ")
         for token in sent:
             m = str(morphs.index(str(token.morph))) if str(token.morph) != "" else "0"
             if len(m) == 1:
+                m = "00" + m
+            elif len(m) == 2:
                 m = "0" + m
             morph.append(m)
             p = str(pos.index(token.pos_))
@@ -87,19 +90,25 @@ def integral2syntactic(
         for index in range(n_subblocks)
     ]
     n = len(iterator)
-    docs = [
-        nlp(sent)
+    os.environ["TOKENIZERS_PARALLELISM"] = "false"
+    activations = Parallel(n_jobs=10)(
+        delayed(lambda x: extract_syntax(nlp(x)))(i)
         for sent in tqdm(iterator, desc="Applying pipeline.", total=n)
         if sent != ""
-    ]
+    )
+    # docs = [
+    #    nlp(sent)
+    #    for sent in tqdm(iterator, desc="Applying pipeline.", total=n)
+    #    if sent != ""
+    # ]
 
-    n = len(docs)
-    sentences = [
-        doc.text.split(" ") for doc in tqdm(docs, desc="Splitting to words.", total=n)
-    ]
-    activations = [
-        extract_syntax(doc) for doc in tqdm(docs, desc="Extracting syntax.", total=n)
-    ]
+    # n = len(docs)
+    # sentences = [
+    #    doc.text.split(" ") for doc in tqdm(docs, desc="Splitting to words.", total=n)
+    # ]
+    # activations = [
+    #    extract_syntax(doc) for doc in tqdm(docs, desc="Extracting syntax.", total=n)
+    # ]
 
     save_pickle(
         os.path.join(os.path.dirname(saving_path), "tmp{index}.pkl"), activations
@@ -115,8 +124,8 @@ def integral2syntactic(
                     tmp.append(
                         transform_ids[value] + 5
                     )  # to leave first indexes to special tokens: ["<pad>", "<s>", "</s>", "<unk>", "<mask>"]
-                else:
-                    print(value, "-", sentences[index][i])
+                # else:
+                #    print(value, "-", sentences[index][i])
             iterator.append(tmp)
         iterator = [i for l in iterator for i in l]
 
