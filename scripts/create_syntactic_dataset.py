@@ -34,7 +34,7 @@ if __name__ == "__main__":
     parser.add_argument("--index", type=int, default=None)
     parser.add_argument("--nblocks", type=int, default=1000)
     parser.add_argument("--language", type=str, default="english")
-    parser.add_argument("--normalize", type=bool, default=False, action="store_true")
+    parser.add_argument("--normalize", default=False, action="store_true")
     parser.add_argument("--saving_path", type=str, default="./syntactic_features.pkl")
 
     args = parser.parse_args()
