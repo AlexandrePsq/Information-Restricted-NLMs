@@ -34,6 +34,7 @@ def load_nlp_pipeline(
         config={"model": os.path.join(download_dir, "models", benepar_model[language])},
     )
     print(nlp.pipe_names)
+    return nlp
 
 
 if __name__ == "__main__":

@@ -76,14 +76,20 @@ def integral2syntactic(
     n = len(iterator)
     if index is not None:
         iterator = iterator[index * n // nblocks : (index + 1) * n // nblocks]
+        n = len(iterator)
     else:
         index = ""
     # iterator = [' '.join([word.lower() for word in sent.split(' ')]) for sent in iterator]
-    print(len(iterator))
-    print([len(i) if i is not None else "None" for i in iterator])
+    # We group sentences in batches of 100 sentences for computational efficiency
+    n_subblocks = 100
+    iterator = [
+        " ".join(iterator[index * n // n_subblocks : (index + 1) * n // n_subblocks])
+        for index in range(n_subblocks)
+    ]
+    n = len(iterator)
     docs = [
         nlp(sent)
-        for sent in tqdm(iterator, desc="Applying pipeline.", total=len(iterator))
+        for sent in tqdm(iterator, desc="Applying pipeline.", total=n)
         if sent != ""
     ]
 
