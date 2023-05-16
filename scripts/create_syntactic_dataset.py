@@ -8,7 +8,10 @@ from irnlm.data.extract_syntactic_features import integral2syntactic
 from irnlm.utils import save_pickle, write
 
 
-def load_nlp_pipeline(language):
+def load_nlp_pipeline(
+    language,
+    download_dir="/neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/Information-Restrited-NLMs/data",
+):
     """ """
     benepar_model = {
         "english": "benepar_en3",
@@ -21,7 +24,10 @@ def load_nlp_pipeline(language):
     nlp = set_nlp_pipeline(name=model[language])
     special_case = [{ORTH: "hasnt"}]
     nlp.tokenizer.add_special_case("hasnt", special_case)
-    benepar.download(benepar_model[language])
+    benepar.download(
+        benepar_model[language],
+        download_dir=download_dir,
+    )
     nlp.add_pipe("benepar", config={"model": benepar_model[language]})
     print(nlp.pipe_names)
 
@@ -36,11 +42,16 @@ if __name__ == "__main__":
     parser.add_argument("--language", type=str, default="english")
     parser.add_argument("--normalize", default=False, action="store_true")
     parser.add_argument("--saving_path", type=str, default="./syntactic_features.pkl")
+    parser.add_argument(
+        "--download_dir",
+        type=str,
+        default="/neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/Information-Restrited-NLMs/data",
+    )
 
     args = parser.parse_args()
     path_integral_text = args.text
 
-    nlp = load_nlp_pipeline(args.language)
+    nlp = load_nlp_pipeline(args.language, download_dir=args.download_dir)
 
     if args.normalize:
         transform_ids = get_ids_syntax(args.language)
