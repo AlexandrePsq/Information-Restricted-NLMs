@@ -1,4 +1,5 @@
 import os
+import gc
 from tqdm import tqdm
 from joblib import Parallel, delayed
 
@@ -7,11 +8,7 @@ from irnlm.data.text_tokenizer import tokenize
 from irnlm.data.utils import get_possible_morphs, get_possible_pos
 
 
-morphs = get_possible_morphs()
-pos = get_possible_pos()
-
-
-def extract_syntax(doc):
+def extract_syntax(doc, morphs, pos):
     """Extract number of closing nodes for each words of an input sequence."""
     ncn = []
     morph = []
@@ -72,6 +69,9 @@ def integral2syntactic(
     Returns:
         - iterator: list of str (content words)
     """
+    morphs = get_possible_morphs(nlp)
+    pos = get_possible_pos()
+
     iterator = tokenize(
         path, language=language, with_punctuation=True, convert_numbers=convert_numbers
     )
@@ -92,10 +92,11 @@ def integral2syntactic(
     n = len(iterator)
     os.environ["TOKENIZERS_PARALLELISM"] = "false"
     activations = Parallel(n_jobs=10)(
-        delayed(lambda x: extract_syntax(nlp(x)))(i)
+        delayed(lambda x: extract_syntax(nlp(x), morphs, pos))(sent)
         for sent in tqdm(iterator, desc="Applying pipeline.", total=n)
         if sent != ""
     )
+    gc.collect()
     # docs = [
     #    nlp(sent)
     #    for sent in tqdm(iterator, desc="Applying pipeline.", total=n)

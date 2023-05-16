@@ -116,7 +116,12 @@ def get_ids_syntax(language):
 
 def get_possible_morphs(nlp):
     """Retrieve list of possible TAGs."""
-    return nlp._meta["labels"]["morphologizer"]
+    morphs = nlp._meta["labels"]["morphologizer"]
+    for pos in get_possible_pos():
+        morphs = [
+            i.replace(f"|POS={pos}", "").replace(f"POS={pos}|", "") for i in morphs
+        ]
+    return morphs
 
 
 def get_possible_tag():
