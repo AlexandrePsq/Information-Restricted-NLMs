@@ -79,6 +79,8 @@ def integral2syntactic(
     else:
         index = ""
     # iterator = [' '.join([word.lower() for word in sent.split(' ')]) for sent in iterator]
+    print(len(iterator))
+    print([len(i) if i is not None else "None" for i in iterator])
     docs = [
         nlp(sent)
         for sent in tqdm(iterator, desc="Applying pipeline.", total=len(iterator))
