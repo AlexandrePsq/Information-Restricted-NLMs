@@ -12,7 +12,7 @@ def load_nlp_pipeline(language):
     """ """
     benepar_model = {
         "english": "benepar_en3",
-        "french": "benepar_fr",
+        "french": "benepar_fr2",
     }
     model = {
         "english": "en_core_web_lg",
