@@ -112,7 +112,7 @@ def integral2syntactic(
     # ]
 
     save_pickle(
-        os.path.join(os.path.dirname(saving_path), "tmp{index}.pkl"), activations
+        os.path.join(os.path.dirname(saving_path), f"tmp{index}.pkl"), activations
     )
     if normalize:
         iterator = []
