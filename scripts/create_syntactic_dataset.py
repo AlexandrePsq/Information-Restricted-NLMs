@@ -1,3 +1,4 @@
+import os
 import argparse
 
 import benepar
@@ -28,7 +29,10 @@ def load_nlp_pipeline(
         benepar_model[language],
         download_dir=download_dir,
     )
-    nlp.add_pipe("benepar", config={"model": benepar_model[language]})
+    nlp.add_pipe(
+        "benepar",
+        config={"model": os.path.join(download_dir, "models", benepar_model[language])},
+    )
     print(nlp.pipe_names)
 
 
