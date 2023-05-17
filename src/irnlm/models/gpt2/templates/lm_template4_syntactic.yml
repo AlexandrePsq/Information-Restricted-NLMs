@@ -1,5 +1,5 @@
 #####
-# From Appendix A.3 of the BERT paper, when fine-tuning BERT on a specific task, 
+# From Appendix A.3 of the BERT paper, when fine-tuning BERT on a specific task,
 # the authors recommend:
 #     - Batch size: 16, 32
 #     - Learning rate (Adam): 5e-5, 3e-5, 2e-5
@@ -7,12 +7,11 @@
 #     - eps = 1e-8
 #####
 
-
 # General
 task: language-modeling # Task on which to fine-tune the model ['POS-tagging', 'NER', 'sentiment-analysis', 'sentence-classification', 'mask-language-modeling]
 seed: 1111 # Seed for reproductibility
 output_dir: /neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/derivatives/fMRI/models/french/irnlm/GPT-2/GPT-2_L-4_H-768_syntactic
-log_file: logs_validation.log
+log_file: logs_training.log
 local_rank: -1
 do_test: True
 do_train: True
@@ -31,10 +30,10 @@ batch_size_eval: 64
 
 # Model & Tokenizer
 model_type: syntactic
-pretrained_model:    # gpt2 # Name of (or path to) the pre-trained BERT model to use
-pretrained_tokenizer:   # gpt2 # Name of (or path to) the pre-trained BERT tokenizer to use
+pretrained_model: # gpt2 # Name of (or path to) the pre-trained BERT model to use
+pretrained_tokenizer: # gpt2 # Name of (or path to) the pre-trained BERT tokenizer to use
 config_path: "/neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/Information-Restrited-NLMs/src/irnlm/models/gpt2/configs/gpt2_L-4_H-768_A-12_syntactic/config.json"
-tokenizer_training_data_paths: 
+tokenizer_training_data_paths:
   - "/neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/french/training_data/training_data.000"
   - "/neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/french/training_data/training_data.001"
   - "/neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/french/training_data/training_data.002"
@@ -52,7 +51,7 @@ tokenizer_special_tokens:
   - "<unk>" # "[UNK]"
   - "<mask>" # "[MASK]"
 tokenizer_path: "/neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/french/training_data/syntactic"
-train_paths: 
+train_paths:
   - /neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/french/training_data/CC100_syntactic_train_split-0.pkl
   - /neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/french/training_data/CC100_syntactic_train_split-1.pkl
   - /neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/french/training_data/CC100_syntactic_train_split-2.pkl
@@ -63,9 +62,9 @@ train_paths:
   - /neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/french/training_data/CC100_syntactic_train_split-7.pkl
   - /neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/french/training_data/CC100_syntactic_train_split-8.pkl
   - /neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/french/training_data/CC100_syntactic_train_split-9.pkl
-dev_paths: 
+dev_paths:
   - /neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/french/training_data/CC100_syntactic_dev_split-0.pkl #training_data.010
-test_paths: 
+test_paths:
   - /neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/french/training_data/CC100_syntactic_test_split-0.pkl #training_data.011
 output_attentions: True
 output_hidden_states: True

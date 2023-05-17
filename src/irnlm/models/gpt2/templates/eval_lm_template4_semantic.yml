@@ -11,17 +11,18 @@
 task: language-modeling # Task on which to fine-tune the model ['POS-tagging', 'NER', 'sentiment-analysis', 'sentence-classification', 'mask-language-modeling]
 seed: 1111 # Seed for reproductibility
 output_dir: /neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/derivatives/fMRI/models/french/irnlm/GPT-2/GPT-2_L-4_H-768_semantic
-log_file: logs_training.log
+model: end-epoch-2
+log_file: logs_eval.log
 local_rank: -1
 do_test: True
-do_train: True
+do_train: False
 do_validation: True
 metric_name: classification
 
 # Datasets
 dataset_dir: "/neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/french/training_data" #english/all_training" # Path/URL to the folder containing the dataset to use for fine-tuning
 use_output_mask: False # for token classification
-nb_splits: 10 #5 for french
+nb_splits: 1 #5 for french
 
 # Data Loader
 train_size_percentage: 0.9
@@ -66,8 +67,8 @@ dev_paths:
   - /neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/french/training_data/CC100_semantic_dev_split-0.pkl #training_data.010
 test_paths:
   - /neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/french/training_data/CC100_semantic_test_split-0.pkl #training_data.011
-output_attentions: True
-output_hidden_states: True
+output_attentions: False
+output_hidden_states: False
 max_length: 512
 masking_proportion: 15
 start_from_scratch: True
@@ -79,16 +80,3 @@ min_frequency: 2
 limit_alphabet: 1000
 context_size: 508
 device_map:
-
-# Optimizer
-learning_rate: 1e-4 # Default is 5e-5
-adam_epsilon: 1e-8 # Adam_epsilon  - default is 1e-8.
-
-# Scheduler
-num_warmup_steps: 0 # Default value in run_glue.py
-
-# Training
-nb_epochs: 3 # BERT authors recommended between 2 and 4
-nb_checkpoints: 10 # number of checkpoints at which to save model state
-start_epoch: 0
-init_checkpoints: 1
