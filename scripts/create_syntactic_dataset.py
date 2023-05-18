@@ -2,6 +2,7 @@ import os
 import argparse
 
 import benepar
+import spacy
 from spacy.symbols import ORTH
 
 from irnlm.data.utils import set_nlp_pipeline, get_ids_syntax
@@ -29,6 +30,7 @@ def load_nlp_pipeline(
         benepar_model[language],
         download_dir=download_dir,
     )
+    spacy.require_cpu()
     nlp.add_pipe(
         "benepar",
         config={"model": os.path.join(download_dir, "models", benepar_model[language])},
