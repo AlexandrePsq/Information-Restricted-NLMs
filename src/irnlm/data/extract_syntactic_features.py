@@ -75,56 +75,60 @@ def integral2syntactic(
             "CC100_syntactic_train_split-" + os.path.basename(path).split(".")[1],
         )
     )
-    morphs = get_possible_morphs(nlp)
-    pos = get_possible_pos()
-
-    iterator = tokenize(
-        path, language=language, with_punctuation=True, convert_numbers=convert_numbers
+    output_path = os.path.join(
+        os.path.dirname(saving_path),
+        "CC100_syntactic_train_split-" + os.path.basename(path).split(".")[1],
+        f"tmp{index}.pkl",
     )
-    iterator = [item.strip() for item in iterator]
-    n = len(iterator)
-    if index is not None:
-        iterator = iterator[index * n // nblocks : (index + 1) * n // nblocks]
+    if not os.path.exists(output_path):
+        morphs = get_possible_morphs(nlp)
+        pos = get_possible_pos()
+
+        iterator = tokenize(
+            path,
+            language=language,
+            with_punctuation=True,
+            convert_numbers=convert_numbers,
+        )
+        iterator = [item.strip() for item in iterator]
         n = len(iterator)
-    else:
-        index = ""
-    # iterator = [' '.join([word.lower() for word in sent.split(' ')]) for sent in iterator]
-    # We group sentences in batches of 100 sentences for computational efficiency
-    n_subblocks = 100
-    iterator = [
-        " ".join(iterator[index * n // n_subblocks : (index + 1) * n // n_subblocks])
-        for index in range(n_subblocks)
-    ]
-    n = len(iterator)
-    os.environ["TOKENIZERS_PARALLELISM"] = "false"
-    activations = Parallel(n_jobs=10)(
-        delayed(lambda x: extract_syntax(nlp(x), morphs, pos))(sent)
-        for sent in tqdm(iterator, desc="Applying pipeline.", total=n)
-        if sent != ""
-    )
-    gc.collect()
-    # docs = [
-    #    nlp(sent)
-    #    for sent in tqdm(iterator, desc="Applying pipeline.", total=n)
-    #    if sent != ""
-    # ]
+        if index is not None:
+            iterator = iterator[index * n // nblocks : (index + 1) * n // nblocks]
+            n = len(iterator)
+        else:
+            index = ""
+        # iterator = [' '.join([word.lower() for word in sent.split(' ')]) for sent in iterator]
+        # We group sentences in batches of 100 sentences for computational efficiency
+        n_subblocks = 100
+        iterator = [
+            " ".join(
+                iterator[index * n // n_subblocks : (index + 1) * n // n_subblocks]
+            )
+            for index in range(n_subblocks)
+        ]
+        n = len(iterator)
+        os.environ["TOKENIZERS_PARALLELISM"] = "false"
+        activations = Parallel(n_jobs=10)(
+            delayed(lambda x: extract_syntax(nlp(x), morphs, pos))(sent)
+            for sent in tqdm(iterator, desc="Applying pipeline.", total=n)
+            if sent != ""
+        )
+        gc.collect()
+        # docs = [
+        #    nlp(sent)
+        #    for sent in tqdm(iterator, desc="Applying pipeline.", total=n)
+        #    if sent != ""
+        # ]
 
-    # n = len(docs)
-    # sentences = [
-    #    doc.text.split(" ") for doc in tqdm(docs, desc="Splitting to words.", total=n)
-    # ]
-    # activations = [
-    #    extract_syntax(doc) for doc in tqdm(docs, desc="Extracting syntax.", total=n)
-    # ]
+        # n = len(docs)
+        # sentences = [
+        #    doc.text.split(" ") for doc in tqdm(docs, desc="Splitting to words.", total=n)
+        # ]
+        # activations = [
+        #    extract_syntax(doc) for doc in tqdm(docs, desc="Extracting syntax.", total=n)
+        # ]
 
-    save_pickle(
-        os.path.join(
-            os.path.dirname(saving_path),
-            "CC100_syntactic_train_split-" + os.path.basename(path).split(".")[1],
-            f"tmp{index}.pkl",
-        ),
-        activations,
-    )
+        save_pickle(output_path, activations)
     if normalize:
         iterator = []
         for index, activ in tqdm(
