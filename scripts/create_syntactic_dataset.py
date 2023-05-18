@@ -42,6 +42,7 @@ if __name__ == "__main__":
         description="Extract syntactic features (POS/Morph/NCN) from the integral text and convert them to ids."
     )
     parser.add_argument("--text", type=str)
+    parser.add_argument("--parallel", default=True, type=bool)
     parser.add_argument("--index", type=int, default=None)
     parser.add_argument("--nblocks", type=int, default=1000)
     parser.add_argument("--language", type=str, default="english")
@@ -70,6 +71,7 @@ if __name__ == "__main__":
         language=args.language,
         index=args.index,
         nblocks=args.nblocks,
+        parallel=args.parallel,
         normalize=args.normalize,
         saving_path=args.saving_path,
     )

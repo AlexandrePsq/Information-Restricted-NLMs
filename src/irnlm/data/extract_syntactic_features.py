@@ -53,6 +53,7 @@ def integral2syntactic(
     nblocks=1000,
     normalize=True,
     saving_path="./syntactic_activations.pkl",
+    parallel=True,
 ):
     """Extract syntactic features from the integral text.
     Args:
@@ -108,11 +109,19 @@ def integral2syntactic(
         ]
         n = len(iterator)
         os.environ["TOKENIZERS_PARALLELISM"] = "false"
-        activations = Parallel(n_jobs=10)(
-            delayed(lambda x: extract_syntax(nlp(x), morphs, pos))(sent)
-            for sent in tqdm(iterator, desc="Applying pipeline.", total=n)
-            if sent != ""
-        )
+        if parallel:
+            activations = Parallel(n_jobs=10)(
+                delayed(lambda x: extract_syntax(nlp(x), morphs, pos))(sent)
+                for sent in tqdm(iterator, desc="Applying pipeline.", total=n)
+                if sent != ""
+            )
+        else:
+            activations = [
+                extract_syntax(nlp(sent), morphs, pos)
+                for sent in tqdm(iterator, desc="Applying pipeline.", total=n)
+                if sent != ""
+            ]
+
         gc.collect()
         # docs = [
         #    nlp(sent)
