@@ -302,6 +302,7 @@ def get_word_list_and_freq(path="data/lexique_database.tsv"):
 
 def set_nlp_pipeline(name="en_core_web_lg", to_remove=["ner"], max_length=np.inf):
     """Load and prepare Spacy NLP pipeline."""
+    spacy.require_cpu()
     nlp = spacy.load(name)
     for pipe in to_remove:
         nlp.remove_pipe(pipe)
