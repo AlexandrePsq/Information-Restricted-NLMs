@@ -11,7 +11,7 @@
 task: language-modeling # Task on which to fine-tune the model ['POS-tagging', 'NER', 'sentiment-analysis', 'sentence-classification', 'mask-language-modeling]
 seed: 1111 # Seed for reproductibility
 output_dir: /neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/derivatives/fMRI/models/french/irnlm/GPT-2/GPT-2_L-4_H-768_semantic
-model: end-epoch-2
+model: end-epoch-1_split-4
 log_file: logs_eval.log
 local_rank: -1
 do_test: True
