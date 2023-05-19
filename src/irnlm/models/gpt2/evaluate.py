@@ -12,8 +12,9 @@ import logging
 import argparse
 import pandas as pd
 
-from transformers import GPT2LMHeadModel
+from transformers import GPT2LMHeadModel, GPT2Tokenizer
 
+from irnlm.models.tokenizer import read_bpe
 from irnlm.models.utils import set_seed, get_device
 from irnlm.models.gpt2.processors import ModelProcessor
 from irnlm.utils import read_yaml, save_yaml, check_folder
@@ -70,6 +71,20 @@ if __name__ == "__main__":
     test_data_paths = processor.get_data("test") if parameters["do_test"] else []
 
     # Setting environment for the tokenizer not to interefere with future parallelisation
+    logging.info("Fetching Tokenizer...")
+    if parameters["pretrained_tokenizer"] is not None:
+        tokenizer = GPT2Tokenizer.from_pretrained(parameters["pretrained_tokenizer"])
+    else:
+        tokenizer = read_bpe(
+            path=parameters["tokenizer_path"],
+            max_length=parameters["max_length"],  # max_length
+            training_data_paths=parameters["tokenizer_training_data_paths"],
+            vocab_size=parameters["vocab_size"],
+            special_tokens=parameters["tokenizer_special_tokens"],
+        )
+
+    processor.set_tokenizer(tokenizer)
+    # Setting environment for the tokenizer not to interefere with future parallelisation
     os.environ["TOKENIZERS_PARALLELISM"] = "false"
     logging.info("\tDone.")
 
@@ -78,7 +93,7 @@ if __name__ == "__main__":
     model_processor = ModelProcessor(
         None,
         None,
-        None,
+        tokenizer,
         None,
         device,
         parameters["metric_name"],
@@ -102,7 +117,13 @@ if __name__ == "__main__":
                 "output_hidden_states"
             ],  # Whether the model returns all hidden-states.
         )
-        model_processor.model.to(device)
+        if parameters["device_map"] is not None:
+            device_map = parameters["device_map"]
+            model_processor.model.parallelize(device_map)
+            print(f"Using device_map: {device_map}")
+        else:
+            model_processor.model.to(device)
+
         accuracy, loss = None, None
 
         logging.info("Validation: ")
