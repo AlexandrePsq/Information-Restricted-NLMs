@@ -144,7 +144,9 @@ if __name__ == "__main__":
 
         df = pd.DataFrame(data=stats)
         df.to_csv(
-            os.path.join(parameters["output_dir"], "eval_stats.csv"),
+            os.path.join(
+                parameters["output_dir"], f"eval_stats_{parameters['model']}.csv"
+            ),
             index=False,
         )
         logging.info("\tDone.")

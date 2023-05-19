@@ -505,6 +505,7 @@ class ModelProcessor(object):
             logging.info(
                 f"[{get_timestamp()}] - Creating {set_type} data loader for split {split_index}.."
             )
+            print(f"Using {batch_path}.")
 
             data = data_processor.load_object(batch_path)
             n = len(data)
