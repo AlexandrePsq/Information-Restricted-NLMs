@@ -100,7 +100,7 @@ def integral2syntactic(
             index = ""
         # iterator = [' '.join([word.lower() for word in sent.split(' ')]) for sent in iterator]
         # We group sentences in batches of 100 sentences for computational efficiency
-        n_subblocks = 100
+        n_subblocks = 200
         iterator = [
             " ".join(
                 iterator[index * n // n_subblocks : (index + 1) * n // n_subblocks]
@@ -110,7 +110,7 @@ def integral2syntactic(
         n = len(iterator)
         os.environ["TOKENIZERS_PARALLELISM"] = "false"
         if parallel:
-            activations = Parallel(n_jobs=10)(
+            activations = Parallel(n_jobs=18)(
                 delayed(lambda x: extract_syntax(nlp(x), morphs, pos))(sent)
                 for sent in tqdm(iterator, desc="Applying pipeline.", total=n)
                 if sent != ""
