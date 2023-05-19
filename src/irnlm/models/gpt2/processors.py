@@ -312,7 +312,7 @@ class ModelProcessor(object):
                                     lr = vars(self.optimizer)["param_groups"][0]["lr"]
                                     print(
                                         "| epoch {:3d} | {:5d}/{:5d} batches | lr {:02.2f}e-5 | ms/batch {} | "
-                                        "loss {:5.2f} | ppl {:8.2f}".format(
+                                        "loss {:5.2f} | ppl {:8.2f} | curr. loss {:5.2f}".format(
                                             epoch_i,
                                             step,
                                             self.nb_steps // parameters["batch_size"],
@@ -320,6 +320,7 @@ class ModelProcessor(object):
                                             elapsed,
                                             total_train_loss - tmp,
                                             math.exp(total_train_loss - tmp),
+                                            total_train_loss / (nb_batchs_done + step),
                                         )
                                     )  # / :5.2f
                                     logging.info(
