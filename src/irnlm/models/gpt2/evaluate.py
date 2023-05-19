@@ -54,10 +54,12 @@ if __name__ == "__main__":
 
     logging.info("Instanciating data processor and data paths...")
     processor = LMProcessor(
-        parameters["max_length"],
+        train_paths=parameters["train_paths"],
+        dev_paths=parameters["dev_paths"],
+        test_paths=parameters["test_paths"],
+        max_seq_length=parameters["max_length"],
         device=device,
         output_dir=parameters["output_dir"],
-        dataset_name=parameters["dataset_name"],
         dataset_dir=parameters["dataset_dir"],
         context_size=parameters["context_size"],
         extra=parameters["extra"],
