@@ -62,7 +62,6 @@ if __name__ == "__main__":
         output_dir=parameters["output_dir"],
         dataset_dir=parameters["dataset_dir"],
         context_size=parameters["context_size"],
-        extra=parameters["extra"],
         n_splits=None,
     )
     logging.info("\tDone.")
