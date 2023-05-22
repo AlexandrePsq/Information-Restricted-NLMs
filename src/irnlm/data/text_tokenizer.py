@@ -79,9 +79,8 @@ def tokenize(
     iterator = [
         item
         if len(item.split(" ")) <= max_sent_size * margin
-        else " ".join(
-            item.split(" ")[: int(max_sent_size * margin)]
-        )  # benepar tokenizer is buggy with sentences
+        else " ".join(item.split(" ")[: int(max_sent_size * margin) - 1])
+        + " ."  # benepar tokenizer is buggy with sentences
         # containing more than 512 tokens...
         # so you have to consider an error margin
         # for the maximum number of tokens in each sentence.
