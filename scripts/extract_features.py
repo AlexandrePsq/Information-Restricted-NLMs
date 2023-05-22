@@ -75,6 +75,24 @@ if __name__ == "__main__":
         else len(model[list(model.keys())[0]])
     )
 
+    if tokenizer is not None:
+        special_token_beg = tokenizer.bos_token
+        special_token_end = tokenizer.eos_token
+        special_token_beg_ids = tokenizer(tokenizer.bos_token)["input_ids"][0]
+        special_token_end_ids = tokenizer(tokenizer.eos_token)["input_ids"][0]
+        try:
+            special_token_pad = tokenizer.pad_token
+            special_token_pad_ids = tokenizer(tokenizer.pad_token)["input_ids"][0]
+            space = None
+        except ValueError:
+            special_token_pad = None
+            special_token_pad_ids = None
+            space = 220
+    else:
+        space = None
+        special_token_beg = None
+        special_token_end = None
+
     kwargs = {
         "path": args.path,
         "model": model,
@@ -85,6 +103,9 @@ if __name__ == "__main__":
         "NUM_HIDDEN_LAYERS": NUM_HIDDEN_LAYERS,
         "bsz": args.bsz,
         "language": args.language,
+        "space": space,
+        "special_token_beg": special_token_beg,
+        "special_token_end": special_token_end,
     }
     kwargs = filter_args(extractor_func, kwargs)
     features = extractor_func(**kwargs)
