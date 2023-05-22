@@ -99,6 +99,7 @@ def extract_features(
     special_token_end="<|endoftext|>",
     FEATURE_COUNT=768,
     NUM_HIDDEN_LAYERS=12,
+    n_jobs=5,
 ):
     """Extract the features from GPT-2.
     Args:
@@ -108,7 +109,7 @@ def extract_features(
     """
     features = []
     os.environ["TOKENIZERS_PARALLELISM"] = "false"
-    iterator = integral2semantic(path, language=language)
+    iterator = integral2semantic(path, language=language, n_jobs=n_jobs)
 
     ids = nlp_tokenizer(iterator).word_ids()
     unique_ids = np.unique(ids)
