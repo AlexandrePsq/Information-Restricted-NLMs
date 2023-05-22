@@ -35,6 +35,7 @@ def load_nlp_pipeline(
         "benepar",
         config={"model": os.path.join(download_dir, "models", benepar_model[language])},
     )
+    nlp.max_length = 1000000000
     print(nlp.pipe_names)
     return nlp
 
