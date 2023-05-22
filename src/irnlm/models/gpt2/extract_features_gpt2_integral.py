@@ -220,7 +220,7 @@ def batchify_to_truncated_input(
 def extract_features(
     path,
     model,
-    tokenizer,
+    nlp_tokenizer,
     context_size=100,
     max_seq_length=512,
     space="Ġ",
@@ -235,7 +235,7 @@ def extract_features(
     Args:
         - path: str
         - model: HuggingFace model
-        - tokenizer: HuggingFace tokenizer
+        - nlp_tokenizer: HuggingFace nlp_tokenizer
     """
     features = []
     iterator = tokenize(
@@ -243,7 +243,7 @@ def extract_features(
     )
     iterator = [item.strip() for item in iterator]
 
-    ids = tokenizer(iterator).word_ids()
+    ids = nlp_tokenizer(iterator).word_ids()
     unique_ids = np.unique(ids)
     mapping = {
         i: list(np.where(ids == i)[0]) for i in unique_ids
@@ -251,7 +251,7 @@ def extract_features(
 
     input_ids, indexes, tokens = batchify_to_truncated_input(
         iterator,
-        tokenizer,
+        nlp_tokenizer,
         context_size=context_size,
         max_seq_length=max_seq_length,
         space=space,
