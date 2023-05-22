@@ -100,7 +100,7 @@ def integral2syntactic(
             index = ""
         # iterator = [' '.join([word.lower() for word in sent.split(' ')]) for sent in iterator]
         # We group sentences in batches of 100 sentences for computational efficiency
-        n_subblocks = 1000
+        n_subblocks = 100
         iterator = [
             " ".join(
                 iterator[index * n // n_subblocks : (index + 1) * n // n_subblocks]
