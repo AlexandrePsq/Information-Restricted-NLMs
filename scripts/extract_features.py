@@ -78,7 +78,7 @@ if __name__ == "__main__":
     kwargs = {
         "path": args.path,
         "model": model,
-        "tokenizer": tokenizer,
+        "nlp_tokenizer": tokenizer,
         "context_size": args.context_size,
         "max_seq_length": args.max_seq_length,
         "FEATURE_COUNT": FEATURE_COUNT,
