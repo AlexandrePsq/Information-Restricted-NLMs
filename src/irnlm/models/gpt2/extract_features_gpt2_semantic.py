@@ -107,6 +107,7 @@ def extract_features(
         - nlp_tokenizer: HuggingFace tokenizer
     """
     features = []
+    os.environ["TOKENIZERS_PARALLELISM"] = "false"
     iterator = integral2semantic(path, language=language)
 
     ids = nlp_tokenizer(iterator).word_ids()
