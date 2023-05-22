@@ -24,12 +24,11 @@ def load_model_and_tokenizer(
         - model: HuggingFace model
         - tokenizer: HuggingFace tokenizer
     """
-    tokenizer_path = os.path.join(trained_model, "bpe-vocab.json")
-    if not os.path.exists(tokenizer_path):
-        tokenizer = AutoTokenizer.from_pretrained(tokenizer_path)
+    if not os.path.exists(os.path.join(trained_model, "bpe-vocab.json")):
+        tokenizer = AutoTokenizer.from_pretrained(trained_model)
     else:
         tokenizer = read_bpe(
-            path=tokenizer_path,
+            path=trained_model,
             max_length=max_length,  # max_length
         )
     try:
