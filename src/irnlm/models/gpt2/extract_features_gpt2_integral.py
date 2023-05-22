@@ -151,8 +151,8 @@ def batchify_to_truncated_input(
     )  # +5 because of the special tokens + the current and following tokens
     os.environ["TOKENIZERS_PARALLELISM"] = "true"
     try:
-        data = tokenizer.encode(iterator).ids
-        text = tokenizer.encode(iterator).tokens
+        data = tokenizer(iterator)["input_ids"]
+        text = [tokenizer.tokenize(item) for item in iterator]
     except:
         data = tokenizer.encode(iterator)
         text = tokenizer.tokenize(iterator)
@@ -223,11 +223,8 @@ def extract_features(
     nlp_tokenizer,
     context_size=100,
     max_seq_length=512,
-    space="Ġ",
     bsz=32,
     language="english",
-    special_token_beg="<|endoftext|>",
-    special_token_end="<|endoftext|>",
     FEATURE_COUNT=768,
     NUM_HIDDEN_LAYERS=12,
 ):
@@ -242,6 +239,7 @@ def extract_features(
         path, language=language, with_punctuation=True, convert_numbers=True
     )
     iterator = [item.strip() for item in iterator]
+    iterator = " ".join(iterator)
 
     ids = nlp_tokenizer(iterator).word_ids()
     unique_ids = np.unique(ids)
@@ -254,9 +252,6 @@ def extract_features(
         nlp_tokenizer,
         context_size=context_size,
         max_seq_length=max_seq_length,
-        space=space,
-        special_token_beg=special_token_beg,
-        special_token_end=special_token_end,
     )
 
     with torch.no_grad():

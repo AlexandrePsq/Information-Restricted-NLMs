@@ -6,84 +6,7 @@ from tqdm import tqdm
 import torch
 
 from irnlm.data.extract_semantic_features import integral2semantic
-from irnlm.models.gpt2.extract_features_gpt2_integral import create_examples
-
-
-def batchify_to_truncated_input(
-    iterator,
-    nlp_tokenizer,
-    context_size=None,
-    max_seq_length=512,
-    space="Ġ",
-    special_token_beg="<|endoftext|>",
-    special_token_end="<|endoftext|>",
-):
-    """Batchify sentence 'iterator' string, to get batches of sentences with a specific number of tokens per input.
-    Function used with 'get_truncated_activations'.
-    Arguments:
-        - iterator: sentence str
-        - nlp_tokenizer: Tokenizer object
-        - context_size: int
-        - max_seq_length: int
-        - space: str (default 'Ġ')
-        - special_token_beg: str (default '<|endoftext|>')
-        - special_token_end: str (default '<|endoftext|>')
-    Returns:
-        - input_ids: input batched
-        - indexes: tuple of int
-    """
-    max_seq_length = (
-        max_seq_length if context_size is None else context_size + 5
-    )  # +5 because of the special tokens + the current and following tokens
-    os.environ["TOKENIZERS_PARALLELISM"] = "true"
-    try:
-        data = nlp_tokenizer.encode(iterator).ids
-        text = nlp_tokenizer.encode(iterator).tokens
-    except:
-        data = nlp_tokenizer.encode(iterator)
-        text = nlp_tokenizer.tokenize(iterator)
-
-    if context_size == 0:
-        examples = [
-            create_examples(data[i : i + 2], max_seq_length) for i, _ in enumerate(data)
-        ]
-        tokens = [
-            create_examples(
-                text[i : i + 2],
-                max_seq_length,
-                space=space,
-                special_token_beg=special_token_beg,
-                special_token_end=special_token_end,
-            )
-            for i, _ in enumerate(text)
-        ]
-    else:
-        examples = [
-            create_examples(data[i : i + context_size + 2], max_seq_length)
-            for i, _ in enumerate(data[:-context_size])
-        ]
-        tokens = [
-            create_examples(
-                text[i : i + context_size + 2],
-                max_seq_length,
-                space=space,
-                special_token_beg=special_token_beg,
-                special_token_end=special_token_end,
-            )
-            for i, _ in enumerate(text[:-context_size])
-        ]
-    # the last example in examples has one element less from the input data, but it is compensated by the padding. we consider that the element following the last input token is the special token.
-    features = [
-        torch.FloatTensor(example).unsqueeze(0).to(torch.int64) for example in examples
-    ]
-    input_ids = torch.cat(features, dim=0)
-    indexes = [(1, context_size + 2)] + [
-        (context_size + 1, context_size + 2) for i in range(1, len(input_ids))
-    ]  # shifted by one because of the initial special token
-    # Cleaning
-    del examples
-    del features
-    return input_ids, indexes, tokens
+from irnlm.models.gpt2.extract_features_gpt2_integral import batchify_to_truncated_input
 
 
 def extract_features(
@@ -92,11 +15,8 @@ def extract_features(
     nlp_tokenizer,
     context_size=100,
     max_seq_length=512,
-    space="Ġ",
     bsz=32,
     language="english",
-    special_token_beg="<|endoftext|>",
-    special_token_end="<|endoftext|>",
     FEATURE_COUNT=768,
     NUM_HIDDEN_LAYERS=12,
     n_jobs=5,
@@ -110,21 +30,18 @@ def extract_features(
     features = []
     os.environ["TOKENIZERS_PARALLELISM"] = "false"
     iterator = integral2semantic(path, language=language, n_jobs=n_jobs)
+    iterator = " ".join(iterator)
 
     ids = nlp_tokenizer(iterator).word_ids()
     unique_ids = np.unique(ids)
-    mapping = {
-        i: list(np.where(ids == i)[0]) for i in unique_ids
-    }  # match_tokenized_to_untokenized(tokenized_text, iterator)
+    mapping = {i: list(np.where(ids == i)[0]) for i in unique_ids}
+    # match_tokenized_to_untokenized(tokenized_text, iterator)
 
     input_ids, indexes, tokens = batchify_to_truncated_input(
         iterator,
         nlp_tokenizer,
         context_size=context_size,
         max_seq_length=max_seq_length,
-        space=space,
-        special_token_beg=special_token_beg,
-        special_token_end=special_token_end,
     )
 
     with torch.no_grad():
@@ -152,7 +69,7 @@ def extract_features(
     activations = np.stack([i for l in activations for i in l], axis=0)
     activations = np.swapaxes(
         activations, 0, 1
-    )  # shape: (#nb_layers, batch_size, hidden_state_dimension)
+    )  # shape: (#nb_layers, #nb_tokens, hidden_state_dimension)
 
     for word_index in range(len(mapping.keys())):
         word_activation = []
