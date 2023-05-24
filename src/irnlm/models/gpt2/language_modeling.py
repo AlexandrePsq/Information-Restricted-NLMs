@@ -88,8 +88,14 @@ class LMProcessor(DataProcessor):
 
     def load_object(self, filename):
         """Load computed examples and features."""
-        with open(filename, "rb") as inp:  # Overwrites any existing file.
-            data = pickle.load(inp)
+        try:
+            with open(filename, "rb") as inp:  # Overwrites any existing file.
+                data = pickle.load(inp)
+        except:
+            import pickle5 as pickle
+
+            with open(filename, "rb") as inp:  # Overwrites any existing file.
+                data = pickle.load(inp)
         return data
 
     def get_data_loader(self, features_path, batch_size, local_rank, set_type):
