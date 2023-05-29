@@ -26,7 +26,7 @@ def tokenize(
     with_punctuation=True,
     convert_numbers=True,
     max_sent_size=512,
-    margin=0.85,
+    margin=0.6,
 ):
     """Tokenize a text into sentences.
     Optionnaly preprocess it.

@@ -15,7 +15,7 @@ make
 #  rm text8.zip
 #fi
 
-CORPUS=../../../../data/train_semantic.txt # path to training data
+CORPUS=/neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/french/training_data/glove_train_semantic.txt # path to training data
 VOCAB_FILE=vocab_Semantic.txt # path to vocabulary (it can be an empty path if you want to compute the vocabulary on the training data)
 # You can set vocabulary size (default=50001) in src/vocab_count.c
 COOCCURRENCE_FILE=cooccurrence.bin
@@ -26,7 +26,7 @@ VERBOSE=2
 MEMORY=4.0
 VOCAB_MIN_COUNT=3
 VECTOR_SIZE=768 # embedding vector size
-MAX_ITER=20
+MAX_ITER=12
 WINDOW_SIZE=15 # context window size
 BINARY=2
 NUM_THREADS=48
