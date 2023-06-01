@@ -103,14 +103,14 @@ def get_function_words(language="english"):
     return result
 
 
-def get_ids_syntax(language):
+def get_ids_syntax(folder, language):
     """The syntax ids that are directly computed need to start from 0.
     This is what we correct here with the mapping that is being loaded.
     """
     if language == "english":
-        result = read_yaml("data/english_syntax-id_to_train-id.yml")
+        result = read_yaml(os.path.join(folder, "english_syntax-id_to_train-id.yml"))
     elif language == "french":
-        result = read_yaml("data/french_syntax-id_to_train-id.yml")
+        result = read_yaml(os.path.join(folder, "french_syntax-id_to_train-id.yml"))
     return result
 
 

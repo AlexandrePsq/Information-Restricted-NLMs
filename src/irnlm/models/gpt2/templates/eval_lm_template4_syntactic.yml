@@ -18,6 +18,7 @@ do_test: True
 do_train: False
 do_validation: True
 metric_name: classification
+language: french
 
 # Datasets
 dataset_dir: "/neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/french/training_data" #english/all_training" # Path/URL to the folder containing the dataset to use for fine-tuning
@@ -77,7 +78,7 @@ start_from_scratch: True
 strip_accents: True
 tokenizer_from_scratch: True
 lowercase: True
-vocab_size: 1195
+vocab_size: 2010
 min_frequency: 2
 limit_alphabet: 1000
 context_size: 508

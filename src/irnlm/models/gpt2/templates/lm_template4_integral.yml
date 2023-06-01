@@ -17,6 +17,7 @@ do_test: True
 do_train: True
 do_validation: True
 metric_name: classification
+language: french
 
 # Datasets
 dataset_dir: "/neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/french/training_data" #english/all_training" # Path/URL to the folder containing the dataset to use for fine-tuning
