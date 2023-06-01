@@ -73,7 +73,7 @@ def read_bpe(
     Returns:
         - tokenizer object
     """
-    if model_type == "syntax":
+    if model_type == "syntactic":
         tokenizer = TokenizerSyntax(path, language=language)
     else:
         if os.path.exists(f"{path}/bpe-vocab.json"):
