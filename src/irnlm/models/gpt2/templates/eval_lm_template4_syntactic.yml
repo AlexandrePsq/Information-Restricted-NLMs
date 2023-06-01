@@ -64,9 +64,11 @@ train_paths:
   - /neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/french/training_data/CC100_syntactic_train_split-8.pkl
   - /neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/french/training_data/CC100_syntactic_train_split-9.pkl
 dev_paths:
-  - /neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/french/training_data/CC100_syntactic_dev_split-0.pkl #training_data.010
+  #- /neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/french/training_data/CC100_syntactic_dev_split-0.pkl #training_data.010
+  - /neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/french/training_data/CC100_syntactic_train_split-0.pkl #training_data.010
 test_paths:
-  - /neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/french/training_data/CC100_syntactic_test_split-0.pkl #training_data.011
+  #- /neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/french/training_data/CC100_syntactic_test_split-0.pkl #training_data.011
+  - /neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/french/training_data/CC100_syntactic_train_split-0.pkl #training_data.011
 output_attentions: False
 output_hidden_states: False
 max_length: 512
