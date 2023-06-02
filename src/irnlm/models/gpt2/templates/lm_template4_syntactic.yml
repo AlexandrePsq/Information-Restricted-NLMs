@@ -91,7 +91,7 @@ adam_epsilon: 1e-8 # Adam_epsilon  - default is 1e-8.
 num_warmup_steps: 0 # Default value in run_glue.py
 
 # Training
-nb_epochs: 3 # BERT authors recommended between 2 and 4
+nb_epochs: 5 # BERT authors recommended between 2 and 4
 nb_checkpoints: 10 # number of checkpoints at which to save model state
 start_epoch: 0
 init_checkpoints: 1
