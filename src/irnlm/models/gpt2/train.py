@@ -24,6 +24,9 @@ from irnlm.models.gpt2.modeling_hacked_gpt2_integral import GPT2LMHeadModel
 from irnlm.models.gpt2.modeling_hacked_gpt2_semantic import (
     GPT2LMHeadModel as GPT2LMHeadModelSemantic,
 )
+from irnlm.models.gpt2.modeling_hacked_gpt2_semantic_no_relative_pos import (
+    GPT2LMHeadModel as GPT2LMHeadModelSemanticNoRelativePos,
+)
 from irnlm.models.gpt2.language_modeling import LMProcessor
 from irnlm.utils import (
     read_yaml,
@@ -98,6 +101,8 @@ if __name__ == "__main__":
                 model = GPT2LMHeadModel(GPT2Config(**params))
             elif parameters["model_type"] == "semantic":
                 model = GPT2LMHeadModelSemantic(GPT2Config(**params))
+            elif parameters["model_type"] == "semantic_no_relative_pos":
+                model = GPT2LMHeadModelSemanticNoRelativePos(GPT2Config(**params))
         else:
             if parameters["model_type"] in ["integral", "syntactic"]:
                 model = GPT2LMHeadModel.from_pretrained(
@@ -111,6 +116,16 @@ if __name__ == "__main__":
                 )
             elif parameters["model_type"] == "semantic":
                 model = GPT2LMHeadModelSemantic.from_pretrained(
+                    parameters["pretrained_model"],
+                    output_attentions=parameters[
+                        "output_attentions"
+                    ],  # Whether the model returns attentions weights.
+                    output_hidden_states=parameters[
+                        "output_hidden_states"
+                    ],  # Whether the model returns all hidden-states.
+                )
+            elif parameters["model_type"] == "semantic_no_relative_pos":
+                model = GPT2LMHeadModelSemanticNoRelativePos.from_pretrained(
                     parameters["pretrained_model"],
                     output_attentions=parameters[
                         "output_attentions"
