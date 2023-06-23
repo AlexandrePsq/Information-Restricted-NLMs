@@ -1,3 +1,4 @@
+import re
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
@@ -79,13 +80,13 @@ def batchify_pos_input(
 def extract_features(
     path,
     model,
+    nlp_tokenizer,
     context_size=100,
     max_seq_length=512,
     bsz=32,
     FEATURE_COUNT=768,
     NUM_HIDDEN_LAYERS=12,
-    language="english",
-    folder="/neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/french/training_data/syntactic/",
+    language="english", #nlp_tokenizer="/neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/french/training_data/syntactic/",
 ):
     """Extract the features from GPT-2.
     Args:
@@ -94,8 +95,9 @@ def extract_features(
       - tokenizer: HuggingFace tokenizer
     """
     features = []
-    nlp_tokenizer = TokenizerSyntax(folder, language=language)
-    iterator = nlp_tokenizer(path)
+    #nlp_tokenizer = TokenizerSyntax(nlp_tokenizer, language=language)
+    iterator = nlp_tokenizer(path)['input_ids']
+    #nlp_tokenizer.add_tokens(re.findall(r'\d+', iterator))
 
     mapping = {i: [i] for i, j in enumerate(iterator)}
     print(f"Using context length of {context_size}.")

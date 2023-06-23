@@ -1,4 +1,5 @@
 import os
+import re
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
@@ -24,12 +25,13 @@ def load_model_and_tokenizer(
         - model: HuggingFace model
         - tokenizer: HuggingFace tokenizer
     """
-    if not os.path.exists(os.path.join(trained_model, "bpe-vocab.json")):
+    if (not os.path.exists(os.path.join(trained_model, "bpe-vocab.json"))) and (not os.path.exists(os.path.join(trained_model, "french_syntax-id_to_train-id.yml"))) and (not os.path.exists(os.path.join(trained_model, "english_syntax-id_to_train-id.yml"))):
         tokenizer = AutoTokenizer.from_pretrained(trained_model)
     else:
         tokenizer = read_bpe(
             path=trained_model,
             max_length=max_length,  # max_length
+            model_type=model_type,
         )
     try:
         special_token_pad_ids = tokenizer(tokenizer.pad_token)["input_ids"][0]
@@ -236,16 +238,28 @@ def extract_features(
     """
     features = []
     iterator = tokenize(
-        path, language=language, with_punctuation=True, convert_numbers=True
+        path, language=language, with_punctuation=True, convert_numbers=False
     )
     iterator = [item.strip() for item in iterator]
     iterator = " ".join(iterator)
+    
+    # Computing mapping
+    items = [nlp_tokenizer.tokenize(i) for i in iterator.split(' ')]
+    count = 0
+    mapping = {}
+    for i, j in enumerate(items):
+        for k in j:
+            if i not in mapping.keys():
+                mapping[i] = [count]
+            else:
+                mapping[i] += [count]
+            count += 1
 
-    ids = nlp_tokenizer(iterator).word_ids()
-    unique_ids = np.unique(ids)
-    mapping = {
-        i: list(np.where(ids == i)[0]) for i in unique_ids
-    }  # match_tokenized_to_untokenized(tokenized_text, iterator)
+    #ids = nlp_tokenizer(iterator).word_ids()
+    #unique_ids = np.unique(ids)
+    #mapping = {
+    #    i: list(np.where(ids == i)[0]) for i in unique_ids
+    #}  # match_tokenized_to_untokenized(tokenized_text, iterator)
 
     input_ids, indexes, tokens = batchify_to_truncated_input(
         iterator,
