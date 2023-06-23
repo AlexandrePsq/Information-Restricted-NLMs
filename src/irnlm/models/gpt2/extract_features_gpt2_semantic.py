@@ -1,4 +1,5 @@
 import os
+import re
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
@@ -31,12 +32,25 @@ def extract_features(
     os.environ["TOKENIZERS_PARALLELISM"] = "false"
     iterator = integral2semantic(path, language=language, n_jobs=n_jobs)
     iterator = " ".join(iterator)
-
-    ids = nlp_tokenizer(iterator).word_ids()
-    unique_ids = np.unique(ids)
-    mapping = {i: list(np.where(ids == i)[0]) for i in unique_ids}
-    # match_tokenized_to_untokenized(tokenized_text, iterator)
-
+    
+    # Computing mapping
+    items = [nlp_tokenizer.tokenize(i) for i in iterator.split(' ')]
+    count = 0
+    mapping = {}
+    for i, j in enumerate(items):
+        for k in j:
+            if i not in mapping.keys():
+                mapping[i] = [count]
+            else:
+                mapping[i] += [count]
+            count += 1
+    #ids = nlp_tokenizer(iterator).word_ids()
+    #unique_ids = np.unique(ids)
+    #mapping = {
+    #    i: list(np.where(ids == i)[0]) for i in unique_ids
+    #}  # match_tokenized_to_untokenized(tokenized_text, iterator)
+    
+    
     input_ids, indexes, tokens = batchify_to_truncated_input(
         iterator,
         nlp_tokenizer,

@@ -192,7 +192,7 @@ class TokenizerSyntax(object):
         self.morphs = get_possible_morphs(self.nlp)
         self.pos = get_possible_pos()
 
-    def __call__(self, x, convert_numbers=True) -> Any:
+    def __call__(self, x, convert_numbers=False) -> Any:
         if x == self.bos_token:
             output = {"input_ids": [1]}
         elif x == self.eos_token:
@@ -207,7 +207,7 @@ class TokenizerSyntax(object):
             output = self.encode(x, convert_numbers=convert_numbers)
         return output
 
-    def encode(self, path, convert_numbers=True):
+    def encode(self, path, convert_numbers=False):
         iterator = tokenize(
             path,
             language=self.language,
