@@ -67,9 +67,13 @@ if __name__ == "__main__":
         )
 
     processor.set_tokenizer(tokenizer)
-    train_data_paths = parameters["train_paths"]
-    dev_data_paths = parameters["dev_paths"]
-    test_data_paths = parameters["test_paths"]
+    train_data_paths = [
+        path.replace(".pkl", ".txt") for path in parameters["train_paths"]
+    ]
+    dev_data_paths = [path.replace(".pkl", ".txt") for path in parameters["dev_paths"]]
+    test_data_paths = [
+        path.replace(".pkl", ".txt") for path in parameters["test_paths"]
+    ]
 
     n = len(train_data_paths) + len(dev_data_paths) + len(test_data_paths)
 
