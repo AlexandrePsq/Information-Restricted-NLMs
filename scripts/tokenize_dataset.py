@@ -55,6 +55,7 @@ if __name__ == "__main__":
     if parameters["pretrained_tokenizer"] is not None:
         tokenizer = GPT2Tokenizer.from_pretrained(parameters["pretrained_tokenizer"])
     else:
+        check_folder(parameters["tokenizer_path"])
         tokenizer = read_bpe(
             path=parameters["tokenizer_path"],
             max_length=parameters["max_length"],  # max_length
