@@ -67,9 +67,9 @@ if __name__ == "__main__":
         )
 
     processor.set_tokenizer(tokenizer)
-    train_data_paths = processor.get_data("train") if parameters["do_train"] else None
-    dev_data_paths = processor.get_data("dev") if parameters["do_validation"] else None
-    test_data_paths = processor.get_data("test") if parameters["do_test"] else None
+    train_data_paths = parameters["train_paths"]
+    dev_data_paths = parameters["dev_paths"]
+    test_data_paths = parameters["test_paths"]
 
     n = len(train_data_paths) + len(dev_data_paths) + len(test_data_paths)
 
