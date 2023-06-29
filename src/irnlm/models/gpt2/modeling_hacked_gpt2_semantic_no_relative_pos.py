@@ -632,9 +632,6 @@ class GPT2Model(GPT2PreTrainedModel):
 
         #### HERE ####
         print("CAREFUL: POSITION EMBEDDINGS WERE REMOVED !!!! ")
-        print(
-            "/!\/!\/!\ CAREFUL USING RELATIVE POSITION EMBEDDING IN ATTENTION SCORES /!\/!\/!\ "
-        )
         #### HERE ####
 
         # Model parallel

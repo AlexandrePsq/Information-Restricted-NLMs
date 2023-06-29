@@ -90,7 +90,7 @@ python scripts/tokenize_dataset.py --path data/train_split-1.txt --type integral
 # Repeat for all splits of train/test/dev
 
 # Semantic features extraction
-python scripts/create_semantic_dataset.py --text data/train_split-1.txt --saving_path data/train_semantic_split-1.txt
+python scripts/create_semantic_dataset.py --text data/train_split-1.txt --saving_path data/train_semantic_split-1.txt --language french
 # Semantic Tokenization
 python scripts/tokenize_dataset.py --path data/train_semantic_split-1.txt --type semantic
 # Repeat for all splits of train/test/dev
