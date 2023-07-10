@@ -83,7 +83,7 @@ if __name__ == "__main__":
     parser.add_argument("--saving_path", type=str, default="derivatives/features.csv")
 
     args = parser.parse_args()
-    extractor_func = extractor_dict[args.model][args.model_type]
+    extractor_func = extractor_dict[args.model][args.tokenizer_type]
     model, tokenizer = model_tokenizer_dict[args.model][
         "_".join([args.model_type, args.tokenizer_type])
     ](args.config)
