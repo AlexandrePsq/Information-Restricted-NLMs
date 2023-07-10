@@ -1,3 +1,4 @@
+import pandas as pd
 from tqdm import tqdm
 from joblib import Parallel, delayed
 
@@ -40,7 +41,8 @@ def clean_sentence(sent, mapping, function_words):
 def integral2semantic(path, language="english", n_jobs=-1, convert_numbers=False):
     """Extract semantic features from the integral text.
     Args:
-        - path: path
+        - path: str
+        - language: str
         - n_jobs: int
         - convert_numbers: bool
     Returns:
@@ -60,3 +62,32 @@ def integral2semantic(path, language="english", n_jobs=-1, convert_numbers=False
     # iterator = [clean_sentence(sent, mapping, function_words) for sent in tqdm(iterator, desc='Cleaning sentences', total=len(iterator))]
     iterator = [item for item in iterator if item != ""]
     return iterator
+
+
+def integral_onset_to_semantic_onset(
+    onset_path, saving_path, language="english", n_jobs=-1
+):
+    """Convert integral onsets to semantic onsets.
+    Args:
+        - path: str
+        - language: str
+        - n_jobs: int
+    Returns:
+        - iterator: list of str (content words)
+    """
+    mapping = get_mapping(language)
+    function_words = get_function_words(language=language) + get_punctuation()
+    int_iterator = pd.read_csv(onset_path)
+    sem_iterator = []
+    for i, row in int_iterator.iterrows():
+        if row["word"].lower() in mapping.keys():
+            sem_iterator.append(
+                [mapping[row["word"].lower()], row["onsets"], row["offsets"]]
+            )
+        elif row["word"].lower() not in function_words:
+            sem_iterator.append([row["word"].lower(), row["onsets"], row["offsets"]])
+
+    sem_iterator = pd.DataFrame(
+        data=sem_iterator, columns=["word", "onsets", "offsets"]
+    )  # int_iterator.columns
+    sem_iterator.to_csv(saving_path, index=False)
