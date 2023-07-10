@@ -127,6 +127,7 @@ if __name__ == "__main__":
         "special_token_beg": special_token_beg,
         "special_token_end": special_token_end,
         "n_jobs": 5,
+        "convert_numbers": False,
     }
     kwargs = filter_args(extractor_func, kwargs)
     features = extractor_func(**kwargs)

@@ -86,7 +86,8 @@ def extract_features(
     bsz=32,
     FEATURE_COUNT=768,
     NUM_HIDDEN_LAYERS=12,
-    language="english", #nlp_tokenizer="/neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/french/training_data/syntactic/",
+    convert_numbers=False,
+    language="english",  # nlp_tokenizer="/neurospin/unicog/protocols/IRMf/LePetitPrince_Pallier_2018/LePetitPrince/data/text/french/training_data/syntactic/",
 ):
     """Extract the features from GPT-2.
     Args:
@@ -95,9 +96,9 @@ def extract_features(
       - tokenizer: HuggingFace tokenizer
     """
     features = []
-    #nlp_tokenizer = TokenizerSyntax(nlp_tokenizer, language=language)
-    iterator = nlp_tokenizer(path)['input_ids']
-    #nlp_tokenizer.add_tokens(re.findall(r'\d+', iterator))
+    # nlp_tokenizer = TokenizerSyntax(nlp_tokenizer, language=language)
+    iterator = nlp_tokenizer(path, convert_numbers=convert_numbers)["input_ids"]
+    # nlp_tokenizer.add_tokens(re.findall(r'\d+', iterator))
 
     mapping = {i: [i] for i, j in enumerate(iterator)}
     print(f"Using context length of {context_size}.")

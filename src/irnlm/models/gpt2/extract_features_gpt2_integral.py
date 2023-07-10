@@ -254,6 +254,7 @@ def extract_features(
     language="english",
     FEATURE_COUNT=768,
     NUM_HIDDEN_LAYERS=12,
+    convert_numbers=False,
 ):
     """Extract the features from GPT-2.
     Args:
@@ -263,7 +264,7 @@ def extract_features(
     """
     features = []
     iterator = tokenize(
-        path, language=language, with_punctuation=True, convert_numbers=False
+        path, language=language, with_punctuation=True, convert_numbers=convert_numbers
     )
     iterator = [item.strip() for item in iterator]
     iterator = " ".join(iterator)
