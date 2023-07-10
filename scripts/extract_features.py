@@ -27,6 +27,7 @@ extractor_dict = {
         "integral": gpt2_int_extractor,
         "semantic": gpt2_sem_extractor,
         "syntactic": gpt2_syn_extractor,
+        "semantic_no_relative_pos": gpt2_sem_extractor,
     },
     "glove": {
         "integral": glove_int_extractor,
@@ -36,14 +37,28 @@ extractor_dict = {
 }
 model_tokenizer_dict = {
     "gpt2": {
-        "integral": lambda x: load_gpt2(trained_model=x, model_type="integral"),
-        "semantic": lambda x: load_gpt2(trained_model=x, model_type="semantic"),
-        "syntactic": lambda x: load_gpt2(trained_model=x, model_type="syntactic"),
+        "integral_integral": lambda x: load_gpt2(
+            trained_model=x, model_type="integral", tokenizer_type="integral"
+        ),
+        "semantic_semantic": lambda x: load_gpt2(
+            trained_model=x, model_type="semantic", tokenizer_type="semantic"
+        ),
+        "syntactic_syntactic": lambda x: load_gpt2(
+            trained_model=x, model_type="syntactic", tokenizer_type="syntactic"
+        ),
+        "integral_semantic": lambda x: load_gpt2(
+            trained_model=x, model_type="integral", tokenizer_type="semantic"
+        ),
+        "semantic_no_relative_pos_semantic": lambda x: load_gpt2(
+            trained_model=x,
+            model_type="semantic_no_relative_pos",
+            tokenizer_type="semantic",
+        ),
     },
     "glove": {
-        "integral": load_glove_int,
-        "semantic": load_glove_sem,
-        "syntactic": load_glove_syn,
+        "integral_integral": load_glove_int,
+        "semantic_semantic": load_glove_sem,
+        "syntactic_syntactic": load_glove_syn,
     },
 }
 
@@ -55,7 +70,10 @@ if __name__ == "__main__":
     parser.add_argument("--path", type=str)
     parser.add_argument("--model", type=str, default="glove")  #'gpt2'
     parser.add_argument(
-        "--type", type=str, default="integral"
+        "--model_type", type=str, default="integral"
+    )  #'semantic', 'syntactic'
+    parser.add_argument(
+        "--tokenizer_type", type=str, default="integral"
     )  #'semantic', 'syntactic'
     parser.add_argument("--context_size", type=int, default=507)
     parser.add_argument("--max_seq_length", type=int, default=512)
@@ -65,8 +83,10 @@ if __name__ == "__main__":
     parser.add_argument("--saving_path", type=str, default="derivatives/features.csv")
 
     args = parser.parse_args()
-    extractor_func = extractor_dict[args.model][args.type]
-    model, tokenizer = model_tokenizer_dict[args.model][args.type](args.config)
+    extractor_func = extractor_dict[args.model][args.model_type]
+    model, tokenizer = model_tokenizer_dict[args.model][
+        "_".join([args.model_type, args.tokenizer_type])
+    ](args.config)
 
     NUM_HIDDEN_LAYERS = model.config.num_hidden_layers if args.model == "gpt2" else None
     FEATURE_COUNT = (

@@ -13,10 +13,16 @@ from irnlm.models.gpt2.modeling_hacked_gpt2_integral import GPT2LMHeadModel
 from irnlm.models.gpt2.modeling_hacked_gpt2_semantic import (
     GPT2LMHeadModel as GPT2LMHeadModelSemantic,
 )
+from irnlm.models.gpt2.modeling_hacked_gpt2_semantic_no_relative_pos import (
+    GPT2LMHeadModel as GPT2LMHeadModelSemanticNoRelativePos,
+)
 
 
 def load_model_and_tokenizer(
-    trained_model="gpt2", model_type="integral", max_length=512
+    trained_model="gpt2",
+    model_type="integral",
+    max_length=512,
+    tokenizer_type="integral",
 ):
     """Load a HuggingFace model and the associated tokenizer given its name.
     Args:
@@ -25,13 +31,25 @@ def load_model_and_tokenizer(
         - model: HuggingFace model
         - tokenizer: HuggingFace tokenizer
     """
-    if (not os.path.exists(os.path.join(trained_model, "bpe-vocab.json"))) and (not os.path.exists(os.path.join(trained_model, "french_syntax-id_to_train-id.yml"))) and (not os.path.exists(os.path.join(trained_model, "english_syntax-id_to_train-id.yml"))):
+    if (
+        (not os.path.exists(os.path.join(trained_model, "bpe-vocab.json")))
+        and (
+            not os.path.exists(
+                os.path.join(trained_model, "french_syntax-id_to_train-id.yml")
+            )
+        )
+        and (
+            not os.path.exists(
+                os.path.join(trained_model, "english_syntax-id_to_train-id.yml")
+            )
+        )
+    ):
         tokenizer = AutoTokenizer.from_pretrained(trained_model)
     else:
         tokenizer = read_bpe(
             path=trained_model,
             max_length=max_length,  # max_length
-            model_type=model_type,
+            model_type=tokenizer_type,
         )
     try:
         special_token_pad_ids = tokenizer(tokenizer.pad_token)["input_ids"][0]
@@ -47,6 +65,13 @@ def load_model_and_tokenizer(
         )
     elif model_type == "semantic":
         model = GPT2LMHeadModelSemantic.from_pretrained(
+            trained_model,
+            output_hidden_states=True,
+            output_attentions=False,
+            pad_token_id=special_token_pad_ids,
+        )
+    elif model_type == "semantic_no_relative_pos":
+        model = GPT2LMHeadModelSemanticNoRelativePos.from_pretrained(
             trained_model,
             output_hidden_states=True,
             output_attentions=False,
@@ -242,9 +267,9 @@ def extract_features(
     )
     iterator = [item.strip() for item in iterator]
     iterator = " ".join(iterator)
-    
+
     # Computing mapping
-    items = [nlp_tokenizer.tokenize(i) for i in iterator.split(' ')]
+    items = [nlp_tokenizer.tokenize(i) for i in iterator.split(" ")]
     count = 0
     mapping = {}
     for i, j in enumerate(items):
@@ -255,11 +280,11 @@ def extract_features(
                 mapping[i] += [count]
             count += 1
 
-    #ids = nlp_tokenizer(iterator).word_ids()
-    #unique_ids = np.unique(ids)
-    #mapping = {
+    # ids = nlp_tokenizer(iterator).word_ids()
+    # unique_ids = np.unique(ids)
+    # mapping = {
     #    i: list(np.where(ids == i)[0]) for i in unique_ids
-    #}  # match_tokenized_to_untokenized(tokenized_text, iterator)
+    # }  # match_tokenized_to_untokenized(tokenized_text, iterator)
 
     input_ids, indexes, tokens = batchify_to_truncated_input(
         iterator,
